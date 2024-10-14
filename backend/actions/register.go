@@ -94,31 +94,46 @@ func insertUser(args insertUserArgs) (response RegisterOutput, err error) {
 	response = hasuraResponse.Data.Insert_data_users_one
 	return
 }
-
-// insert the user and return user_id
 func execute(variables insertUserArgs) (response GraphQLResponse, err error) {
-	reqBody := InsertGraphQLRequest{
-		Query:     "mutation insertUser($email: String, $name: String, $password: String) {   insert_hasura_users_one(object: {email: $email, name: $name,password: $password}){  user_id   } }",
-		Variables: variables,
-	}
-	reqBytes, err := json.Marshal(reqBody)
-	if err != nil {
-		return
-	}
-	// make request to Hasura
-	resp, err := http.Post("http://localhost:8080/v1/graphql", "application/json", bytes.NewBuffer(reqBytes))
-	if err != nil {
-		return
-	}
-	// parse the response
-	respBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(respBytes, &response)
-	if err != nil {
-		return
-	}
-	// return the response
-	return
+    reqBody := InsertGraphQLRequest{
+        Query:     "mutation  register($email: String, $password: String) {   insert_data_users_one(object: {email: $email ,password: $password}){  user_id   } }",
+        Variables: variables,
+    }
+    reqBytes, err := json.Marshal(reqBody)
+    if err != nil {
+        return
+    }
+
+    req, err := http.NewRequest("POST", "http://localhost:8080/v1/graphql", bytes.NewBuffer(reqBytes))
+    if err != nil {
+        return
+    }
+
+    req.Header.Set("Content-Type", "application/json")
+    req.Header.Set("x-hasura-admin-secret", os.Getenv("HASURA_ADMIN_SECRET"))
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+        return
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        err = fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+        return
+    }
+
+    respBody, err := io.ReadAll(resp.Body)
+    if err != nil {
+        return
+    }
+
+    err = json.Unmarshal(respBody, &response)
+    if err != nil {
+        return
+    }
+
+    return
 }
+
