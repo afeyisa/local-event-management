@@ -13,8 +13,8 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-docker-compose.yml
-local event management.sql
+*.yml
+*.sql
 # Dependency directories (remove the comment below to include it)
 # vendor/
 

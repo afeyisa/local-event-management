@@ -10,44 +10,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/google/uuid"
 )
-
-type User struct {
-    Password string `json:"password"`
-	ID uuid.UUID `json:"user_id"`
-}
-
-type HasuraUsersResponse struct {
-    Data struct {
-        User []User`json:"data_users"`
-    } `json:"data"`
-	Errors []GraphQLError `json:"errors"`
-}
-
-type GraphQLRequest struct {
-	Query     string         `json:"query"`
-}
-
-// type GraphQLError struct {
-// 	Message string `json:"message"`
-// }
-type LoginResponse struct {
-	Success bool `json:"success"`
-}
-
-type loginArgs struct {
-	Email   string `json:"email"`
-	Password string    `json:"password"`
-}
-
-type ActionPayload struct {
-	SessionVariables map[string]interface{} `json:"session_variables"`
-	Input            loginArgs              `json:"input"`
-}
-
-
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("testing login")
 
 	w.Header().Set("Content-Type", "application/json")
 	reqBody, err := io.ReadAll(r.Body)
@@ -59,6 +24,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// parse the body as action payload
 	var actionPayload ActionPayload
 	err = json.Unmarshal(reqBody, &actionPayload)
+	fmt.Println(actionPayload.Input)
 	if err != nil {
 		errorObject := GraphQLError{
 			Message: "invalid payload",
@@ -67,10 +33,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		errorBody, _ := json.Marshal(errorObject)
 		w.Write(errorBody)
 		return
-		
+
 	}
 
-	
 	resp, err := fetchHashedPasswordWithId(actionPayload.Input.Email)
 
 	if err != nil {
@@ -93,7 +58,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(resp.Data.User) == 0{
+	if len(resp.Data.User) == 0 {
 		errorObject := GraphQLError{
 			Message: "unregistered email",
 		}
@@ -125,20 +90,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(errorBody)
 		return
 	}
-	
+
 	// set cookie
 
 	cookie := http.Cookie{
-	Name:     "jwttoken",
-	Value:   token,
-	Path:     "/",
-	HttpOnly: true,
-	Secure:   true,
-	SameSite: http.SameSiteDefaultMode,
-	MaxAge:   86400, // Cookie expiration (1 day)
-    }
+		Name:     "jwttoken",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteDefaultMode,
+		MaxAge:   86400, // Cookie expiration (1 day)
+	}
 
-    http.SetCookie(w, &cookie)
+	http.SetCookie(w, &cookie)
 
 	// Write the response as JSON
 	res := LoginResponse{
@@ -149,29 +114,31 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 // Function to fetch hashed password from Hasura for the given user ID
-func fetchHashedPasswordWithId(email string) (HasuraUsersResponse, error) {
+func fetchHashedPasswordWithId(email string) (GraphqlResponse, error) {
 	query := fmt.Sprintf(`{
-		hasura_users(where: {email: {_eq: "%s"}}) {
-		  password
-		  user_id
+		data_users(where: {email: {_eq: "%s"}}) {
+			password
+			user_id
 		}
-	  }`, email)
+	}`, email)
 
-	var hasuraResp HasuraUsersResponse
+
+	  
+
+	var res GraphqlResponse
 	reqBody := GraphQLRequest{
-		Query:query ,
+		Query: query,
 	}
 
 	jsonReqBody, err := json.Marshal(reqBody)
 	if err != nil {
-		return hasuraResp, fmt.Errorf("failed to marshal request body: %v", err)
+		return res, fmt.Errorf("failed to marshal request body: %v", err)
 	}
 
 	req, err := http.NewRequest("POST", "http://localhost:8080/v1/graphql", bytes.NewBuffer(jsonReqBody))
 	if err != nil {
-		return hasuraResp, fmt.Errorf("failed to create HTTP request: %v", err)
+		return res, fmt.Errorf("failed to create HTTP request: %v", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -180,23 +147,22 @@ func fetchHashedPasswordWithId(email string) (HasuraUsersResponse, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return hasuraResp, fmt.Errorf("failed to request user data")
+		return res, fmt.Errorf("failed to request user data")
 	}
 
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return hasuraResp, fmt.Errorf("failed to fetch user data")
+		return res, fmt.Errorf("failed to fetch user data")
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return hasuraResp, fmt.Errorf("failed to read user data")
+		return res, fmt.Errorf("failed to read user data")
 	}
 
 	// bad request
-	if err := json.Unmarshal(respBody, &hasuraResp); err != nil {
-		return hasuraResp, fmt.Errorf("failed to unmarshal user data")
+	if err := json.Unmarshal(respBody, &res); err != nil {
+		return res, fmt.Errorf("failed to unmarshal user data")
 	}
-	return hasuraResp, nil
+	return res, nil
 }
-

@@ -5,9 +5,6 @@ import (
 	"net/http"
 )
 
-type LogOutResponse struct{
-	Success bool `json:"success"`
-}
 
 
 func LogOutHandler(w http.ResponseWriter, r *http.Request) {
