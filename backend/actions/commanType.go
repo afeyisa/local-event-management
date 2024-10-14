@@ -4,3 +4,7 @@ package actions
 type GraphQLError struct {
 	Message string `json:"message"`
 }
+
+type LoginResponse struct {
+	Success bool `json:"success"`
+}

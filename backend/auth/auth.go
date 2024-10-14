@@ -91,7 +91,7 @@ func AuthHandler(w http.ResponseWriter,r *http.Request){
 			XHasuraRole:        "anonymous",
 			XHasuraAllowedRole: "anonymous",
 		}
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(res)        
 		return
 	}
@@ -105,7 +105,6 @@ func AuthHandler(w http.ResponseWriter,r *http.Request){
 			XHasuraRole:        "anonymous",
 			XHasuraAllowedRole: "anonymous",
 		}
-		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(res)
         return
 	}

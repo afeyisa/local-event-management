@@ -15,7 +15,7 @@ import (
 
 
 
-type InsertUserOutput struct {
+type RegisterOutput struct {
 	User_id uuid.UUID `json:"user_id"`
 }
 type insertUserArgs struct {
@@ -34,7 +34,7 @@ type InsertGraphQLRequest struct {
 }
 
 type GraphQLData struct {
-	Insert_hasura_users_one InsertUserOutput `json:"insert_hasura_users_one"`
+	Insert_data_users_one RegisterOutput `json:"insert_data_users_one"`
 }
 
 type GraphQLResponse struct {
@@ -43,7 +43,7 @@ type GraphQLResponse struct {
 }
 
 func ResgisterHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("test")
+	fmt.Println("test register")
 	// set the response header as JSON
 	w.Header().Set("Content-Type", "application/json")
 
@@ -66,7 +66,7 @@ func ResgisterHandler(w http.ResponseWriter, r *http.Request) {
 	// throw if an error happens
 	if err != nil {
 		errorObject := GraphQLError{
-			Message: err.Error(),
+			Message: "un able to create user with " + actionPayload.Input.Email,
 		}
 		errorBody, _ := json.Marshal(errorObject)
 		w.WriteHeader(http.StatusBadRequest)
@@ -107,8 +107,11 @@ func ResgisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Auto-generated function that takes the Action parameters and must return it's response type
-func insertUser(args insertUserArgs) (response InsertUserOutput, err error) {
-	p, _ := auth.HashPassword(args.Password)
+func insertUser(args insertUserArgs) (response RegisterOutput, err error) {
+	p, err := auth.HashPassword(args.Password)
+	if err != nil{
+		return
+	}
 	args.Password = p
 	hasuraResponse, err := execute(args)
 	// throw if any unexpected error happens
@@ -120,33 +123,48 @@ func insertUser(args insertUserArgs) (response InsertUserOutput, err error) {
 		err = errors.New(hasuraResponse.Errors[0].Message)
 		return
 	}
-	response = hasuraResponse.Data.Insert_hasura_users_one
+	response = hasuraResponse.Data.Insert_data_users_one
 	return
 }
 
+// insert the user and return user_id
 func execute(variables insertUserArgs) (response GraphQLResponse, err error) {
 	reqBody := InsertGraphQLRequest{
-		Query:     "mutation insertUser($email: String, $name: String, $password: String) {   insert_hasura_users_one(object: {email: $email, name: $name,password: $password}){  user_id   } }",
+		Query:     "mutation  register($email: String, $password: String) {   insert_data_users_one(object: {email: $email ,password: $password}){  user_id   } }",
 		Variables: variables,
 	}
 	reqBytes, err := json.Marshal(reqBody)
 	if err != nil {
 		return
 	}
-	// make request to Hasura
-	resp, err := http.Post("http://localhost:8080/v1/graphql", "application/json", bytes.NewBuffer(reqBytes))
+
+	req, err := http.NewRequest("POST", "http://localhost:8080/v1/graphql", bytes.NewBuffer(reqBytes))
 	if err != nil {
 		return
 	}
-	// parse the response
-	respBytes, err := io.ReadAll(resp.Body)
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-hasura-admin-secret", os.Getenv("HASURA_ADMIN_SECRET"))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return
 	}
-	err = json.Unmarshal(respBytes, &response)
+
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return 
+	}
+
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
+		return 
+	}
+	err = json.Unmarshal(respBody, &response);
+	// bad request
+	if  err != nil {
 		return
 	}
-	// return the response
-	return
+	return 
 }
