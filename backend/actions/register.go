@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 )
-func ResgisterHandler(w http.ResponseWriter, r *http.Request) {
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("test")
 	// set the response header as JSON
 	w.Header().Set("Content-Type", "application/json")
