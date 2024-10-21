@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col min-h-screen dark:bg-gray-900"
+    class="flex flex-col min-h-screen dark:bg-gray-900 shadow-md"
   >
     <header class="bg-gray-900 text-white p-4 dark:bg-gray-800">
       <!-- Navigation Bar -->

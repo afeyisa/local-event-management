@@ -5,7 +5,6 @@ export default defineNuxtConfig({
 
   modules: ['@vee-validate/nuxt', '@nuxt/eslint',
   ],
-  // plugins: ['~/plugins/authLoading.js'],
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
   compatibilityDate: '2024-04-03',

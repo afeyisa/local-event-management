@@ -87,7 +87,10 @@
 
 <script setup>
 import { ref } from 'vue'
-// Dummy default events to display on the home page (before search)
+
+definePageMeta({
+})
+
 const defaultEvents = [
   { id: 2, title: 'Rock Concert 2024', description: 'The best rock bands performing live this summer.' },
 ]

@@ -1,6 +1,12 @@
-<!-- create events -->
 <template>
-  <div>
-    hello create events
-  </div>
+  <EventForm />
 </template>
+
+<script setup>
+import EventForm from '~/components/dashboard/EventForm.vue'
+
+definePageMeta({
+  layout: 'mydashboard',
+  middleware: 'auth',
+})
+</script>

@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-gray-900 text-white p-4 dark:bg-gray-800">
+  <header class="bg-blue-500   text-white p-4 dark:bg-gray-800">
     <!-- Navigation Bar -->
     <nav class="container mx-auto flex justify-between items-center">
       <!-- Logo / Branding -->
@@ -16,6 +16,14 @@
         <ThemeButton />
         <ul class="flex items-center space-x-4">
           <!-- Conditional Rendering based on user login status -->
+          <li>
+            <NuxtLink
+              to="/events"
+              class="hover:underline"
+            >
+              My Events
+            </NuxtLink>
+          </li>
           <li>
             <NuxtLink
               to="/login"

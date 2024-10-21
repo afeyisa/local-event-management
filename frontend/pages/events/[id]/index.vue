@@ -1,11 +1,11 @@
-<!-- browse abd filter events -->
+<!-- event detail page -->
 <template>
-  <div class="dark:text-white">
-    Wel Come
+  <div>
+    hello event
   </div>
 </template>
 
-<script setup>
+<script>
 definePageMeta({
   layout: 'mydashboard',
   middleware: 'auth',

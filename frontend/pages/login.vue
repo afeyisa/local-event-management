@@ -81,6 +81,7 @@ import { LOGIN_MUTATION } from '~/graphql/mutation'
 
 definePageMeta({
   layout: 'auth',
+  middleware: 'logedinautoaedirector',
 })
 
 defineRule('validateEmail', (value) => {
@@ -114,7 +115,7 @@ const onLogin = async () => {
       password: password.value,
     },
     )
-    const redirectPath = localStorage.getItem('redirect') || '/' // get the redirect path from query or default to root
+    const redirectPath = localStorage.getItem('redirect') || '/events' // get the redirect path from query or default to root
     localStorage.removeItem('redirect')
     // router.push(redirectPath)
     window.location.href = window.location.origin + redirectPath
