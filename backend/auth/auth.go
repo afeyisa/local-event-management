@@ -80,10 +80,7 @@ func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
 }
 
 
-
-
-
-func AuthHandler(w http.ResponseWriter,r *http.Request){
+func HasuraAuthHandler(w http.ResponseWriter,r *http.Request){
 	fmt.Println("test auth")
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer "){

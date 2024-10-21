@@ -17,8 +17,9 @@ func main() {
 	mux := http.NewServeMux()
  	mux.HandleFunc("/login", actions.LoginHandler)
   	mux.HandleFunc("/register",actions.RegisterHandler)
-  	mux.HandleFunc("/auth",auth.AuthHandler)
+  	mux.HandleFunc("/auth",auth.HasuraAuthHandler)
 	mux.HandleFunc("/logout", actions.LogOutHandler)
+	mux.HandleFunc("/protectpageroute",actions.ProtectPageRoute)
 	err = http.ListenAndServe(":3000", mux)
 	log.Fatal(err)
 }

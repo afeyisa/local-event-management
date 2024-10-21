@@ -24,7 +24,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// parse the body as action payload
 	var actionPayload ActionPayload
 	err = json.Unmarshal(reqBody, &actionPayload)
-	fmt.Println(actionPayload.Input)
 	if err != nil {
 		errorObject := GraphQLError{
 			Message: "invalid payload",
