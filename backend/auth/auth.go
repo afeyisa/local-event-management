@@ -79,31 +79,74 @@ func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
 	return uuid.Nil, fmt.Errorf("invalid token")
 }
 
+func checkCookies(c string) (uuid.UUID, error){
+	if  c == "" {
+				
+		return uuid.UUID{} , fmt.Errorf("no cookie")
+	}
+			
+	token := strings.TrimPrefix(c, "jwttoken=")
+	return  ValidateJWT(token, []byte(os.Getenv("JWT_KEY")))
+}
+func checkHeader(h string) (uuid.UUID,error){
+	// authHeader := h.Get("Authorization")
+	if h == "" || !strings.HasPrefix(h, "Bearer "){       
+		return uuid.UUID{}, fmt.Errorf("no header")
+	}
+	// Extract the token by stripping the "Bearer " prefix
+	token := strings.TrimPrefix(h, "Bearer ")
+    return ValidateJWT(token, []byte(os.Getenv("JWT_KEY")))
+
+}
+
 
 func HasuraAuthHandler(w http.ResponseWriter,r *http.Request){
 	fmt.Println("test auth")
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer "){
-		res := hasuraResponse{
-			XHasuraRole:        "anonymous",
-			XHasuraAllowedRole: "anonymous",
-		}
+// it check both cookies and header to check where the token is carried
+	c, err :=r.Cookie("jwttoken")
+	if err != nil{
+		authHeader := r.Header.Get("Authorization")
+		id,err := checkHeader(authHeader)
+		 if err != nil {
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(hasuraResponse{
+				XHasuraRole:        "anonymous",
+				XHasuraAllowedRole: "anonymous",
+			}) 
+			return
+		 }
+		
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(res)        
+		json.NewEncoder(w).Encode(hasuraResponse{
+			XHasuraUserId:    fmt.Sprintf("%v", id),
+			XHasuraRole:      "user",
+			XHasuraAllowedRole: "anonymous",
+		})
 		return
+
 	}
-	
-	// Extract the token by stripping the "Bearer " prefix
-	token := strings.TrimPrefix(authHeader, "Bearer ")
-    id, err := ValidateJWT(token, []byte(os.Getenv("JWT_KEY")))
-    if err != nil {
-        http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
-		res := hasuraResponse{
+
+	id,err := checkCookies(c.String())
+	if err != nil{
+		authHeader := r.Header.Get("Authorization")
+		id,err := checkHeader(authHeader)
+		 if err != nil {
+			
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(hasuraResponse{
 			XHasuraRole:        "anonymous",
 			XHasuraAllowedRole: "anonymous",
-		}
-		json.NewEncoder(w).Encode(res)
-        return
+		}) 
+		return
+		 }
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(hasuraResponse{
+			XHasuraUserId:    fmt.Sprintf("%v", id),
+			XHasuraRole:      "user",
+			XHasuraAllowedRole: "anonymous",
+		})
+		return
+
 	}
 	res := hasuraResponse{
         XHasuraUserId:    fmt.Sprintf("%v", id),

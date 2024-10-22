@@ -256,3 +256,70 @@ query BrowseEvents(
     thumbnail_image_url
   }
 }
+
+CREATE TYPE data.organize_result AS (
+    organization_id uuid,
+    organizer_id uuid
+);
+
+DROP FUNCTION IF EXISTS data.insert_into_organizes();
+CREATE OR REPLACE FUNCTION data.insert_into_organizes()
+RETURNS TABLE(organization_id uuid, organizer_id uuid)
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    user_id uuid;
+BEGIN
+    -- Fetch the user_id (organizer_id) dynamically from the users table or JWT session
+    SELECT user_id INTO user_id
+    FROM data_users
+    WHERE user_id = current_setting('hasura.user')::uuid;
+
+    -- Insert into data_organizes using the fetched user_id and the new organization_id
+    INSERT INTO data.data_organizes (organization_id, organizer_id)
+    VALUES (NEW.organization_id, user_id);
+
+    -- Return the inserted data as a table
+    RETURN QUERY SELECT NEW.organization_id, user_id;
+END;
+$function$;
+
+
+
+CREATE TRIGGER after_organization_insert
+AFTER INSERT ON data.organizations
+FOR EACH ROW
+EXECUTE FUNCTION data.insert_into_organizes();
+
+
+DROP TRIGGER after_organization_insert ON data.organizations;
+DROP FUNCTION IF EXISTS data.insert_into_organizes();
+
+
+DROP FUNCTION IF EXISTS data.insert_into_organizes();
+CREATE OR REPLACE FUNCTION data.insert_into_organizes()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    user_id uuid;
+BEGIN
+    -- Fetch the user_id (organizer_id) dynamically from the users table or JWT session
+    SELECT user_id INTO user_id
+    FROM data.data_users
+    WHERE user_id = current_setting('hasura.user');
+
+    -- Insert into data_organizes using the fetched user_id and the new organization_id
+    INSERT INTO data.data_organizes (organization_id, organizer_id)
+    VALUES (NEW.organization_id, user_id);
+
+    -- Return the new row (or NULL if not applicable)
+    RETURN NEW;
+END;
+$function$;
+
+CREATE TRIGGER after_organization_insert
+AFTER INSERT ON data.organizations
+FOR EACH ROW
+EXECUTE FUNCTION data.insert_into_organizes();
+

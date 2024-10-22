@@ -17,9 +17,9 @@ func ProtectPageRoute(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 				
-		token1 := strings.TrimPrefix(c.String(), "jwttoken=")
+		token := strings.TrimPrefix(c.String(), "jwttoken=")
 
-		_, err = auth.ValidateJWT(token1, []byte(os.Getenv("JWT_KEY")))
+		_, err = auth.ValidateJWT(token, []byte(os.Getenv("JWT_KEY")))
 		if err != nil {
 			json.NewEncoder(w).Encode(false)       
 			return
