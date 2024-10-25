@@ -13,7 +13,8 @@ func ProtectPageRoute(w http.ResponseWriter, r *http.Request) {
 
 		c, err :=r.Cookie("jwttoken")
 		if  c.String() == "" || err != nil {
-			json.NewEncoder(w).Encode(false)        
+			json.NewEncoder(w).Encode(false) 
+			w.WriteHeader(http.StatusOK)       
 			return
 		}
 				
@@ -21,6 +22,7 @@ func ProtectPageRoute(w http.ResponseWriter, r *http.Request) {
 
 		_, err = auth.ValidateJWT(token, []byte(os.Getenv("JWT_KEY")))
 		if err != nil {
+			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(false)       
 			return
 		}

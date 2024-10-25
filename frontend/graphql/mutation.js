@@ -34,24 +34,31 @@ export const CREATE_ORGANIZATION = gql`
   }
 `
 
+export const UPLOAD_THUMBNAIL_IMAGE = gql`
+    mutation uploadImage($image: String!) {
+      uploadImage(image: $image) {
+        url
+      }
+    }
+  `
+
 export const CREATE_EVENT = gql`
 mutation insertEvent(
   $by_organization_id: uuid!,
   $title: String!,
-  $ticket_price: numeric!,
-  $total_available_tickets: Int!,
-  $event_date: date!,
-  $category_id: uuid!,
-  $description: String!,
-  $venue: String!,
+  $ticket_price: numeric,
+  $total_available_tickets: Int,
+  $event_date: date,
+  $category_id: uuid,
+  $description: String,
+  $venue: String,
   $is_online: Boolean,
-  $thumbnail_image_url: String!,
-  $images: [data_images_insert_input!]!,
+  $thumbnail_image_url: String,
+  $images: [data_images_insert_input!]!,  
   $location: data_locations_insert_input!,
   $address: data_address_insert_input!,
-  # $tags: [data_event_tags_insert_input!]!
+  $tags: [data_event_tags_insert_input!]! 
 ) {
-  # Insert into events table
   insert_data_events_one(
     object: {
       by_organization_id: $by_organization_id,
@@ -64,19 +71,14 @@ mutation insertEvent(
       venue: $venue,
       is_online: $is_online,
       thumbnail_image_url: $thumbnail_image_url,
-      
-  # Insert into images table
-  images:{data: $images},
-  # event_tags{data:}
 
-  # Insert into locations table
-  location:{data: $location},
-
-  # Insert into address table
-  address:{data: $address},
-
-  # Insert into event_tags table
-  # event{data: $tags},
+      images: {data: $images}, 
+      # Insert into locations table
+      location: {data: $location},
+      # Insert into address table
+      address: {data: $address},
+      # Insert into event_tags table
+      event_tags: {data: $tags},
     }
   ) {
     event_id

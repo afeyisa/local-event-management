@@ -18,3 +18,4 @@ export default defineNuxtRouteMiddleware(async (req) => {
     return router.push('/loadingfallback')
   }
 })
+

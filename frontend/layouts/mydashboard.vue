@@ -26,7 +26,7 @@
     <!-- Main Content (Dashboard Layout) -->
     <main class="flex flex-1">
       <!-- Left Sidebar -->
-      <aside class="w-1/4 text-xl bg-gray-100 p-4 dark:bg-gray-700 shadow-md">
+      <aside class="w-1/4 text-xl min-h-screen  bg-gray-100 p-4 dark:bg-gray-700 shadow-md">
         <ul class="space-y-4 pl-10">
           <li>
             <NuxtLink
@@ -39,7 +39,7 @@
 
           <li>
             <NuxtLink
-              to="/events/myevents"
+              to="/events"
               class="text-gray-700 dark:text-white font-semibold hover:text-blue-500"
             >
               My Events
@@ -56,7 +56,7 @@
           <li>
             <NuxtLink
               to="/events/organizations"
-              class="text-blue-500 font-semibold hover:underline"
+              class="ext-gray-700 dark:text-white font-semibold hover:text-blue-500"
             >
               Organizations
             </NuxtLink>
@@ -64,17 +64,17 @@
           <li>
             <NuxtLink
               to="/events/create"
-              class="text-blue-500 font-semibold hover:underline"
+              class="ext-gray-700 dark:text-white font-semibold hover:text-blue-500 "
             >
-              + Create Event
+              Create Event
             </NuxtLink>
           </li>
           <li>
             <NuxtLink
               to="/events/organizations/create"
-              class="text-blue-500 font-semibold hover:underline"
+              class="ext-gray-700 dark:text-white font-semibold hover:text-blue-500 "
             >
-              +Create Organizations
+              Create Organizations
             </NuxtLink>
           </li>
           <li>

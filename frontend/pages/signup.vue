@@ -19,7 +19,7 @@
           type="email"
           name="email"
           r
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          class="mt-1 block w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline focus:outline-1 focus:outline-blue-500 focus:outline-none"
           placeholder="Enter your email"
         />
         <ErrorMessage
@@ -41,7 +41,7 @@
           type="password"
           rules="passordValidate"
           placeholder="Password"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          class="mt-1 block w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline focus:outline-1 focus:outline-blue-500 focus:outline-none"
         />
         <ErrorMessage
           class="text-red-500 mb-4"
@@ -60,7 +60,7 @@
           type="password"
           placeholder="Confirm Password"
           rules="confirmed:password"
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+          class="mt-1 block w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline focus:outline-1 focus:outline-blue-500 focus:outline-none"
         />
       </div>
       <ErrorMessage
@@ -70,7 +70,7 @@
 
       <button
         :disabled="loading"
-        class="w-full bg-blue-500 text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
+        class="w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
       >
         Signup
       </button>

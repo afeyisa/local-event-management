@@ -35,7 +35,7 @@ CREATE TABLE data.events (
   ticket_price decimal DEFAULT 0 CHECK (ticket_price >= 0),
   total_available_tickets int DEFAULT 0 CHECK (total_available_tickets >= 0),
   event_date date,
-  category varchar,
+  category_id varchar,
   description text,
   is_online boolean,
   venue text,
@@ -50,9 +50,9 @@ CREATE TABLE categories (
 
 
 CREATE TABLE data.images (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id uuid NOT NULL,
-  image_url varchar NOT NULL,
-  PRIMARY KEY (event_id, image_url)
+  image_url varchar ,
 );
 
 CREATE TABLE data.locations (

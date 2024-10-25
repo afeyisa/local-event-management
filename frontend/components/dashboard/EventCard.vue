@@ -2,7 +2,7 @@
   <div class="event-card min-w-md max-h-lg rounded overflow-hidden shadow-lg bg-white dark:bg-gray-900">
     <!-- Event Image -->
     <img
-      :src="event.image"
+      :src="event.thumbnail_image_url ||'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
       alt="Event Image"
       class="w-full h-48 object-cover"
     >
@@ -34,7 +34,7 @@
             d="M8 7V3m8 4V3m-9 8h10m-9 4h10m-9 4h10"
           />
         </svg>
-        {{ formatDate(event.date) }}
+        {{ formatDate(event.event_date) }}
       </div>
       <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-2">
         <svg
@@ -51,7 +51,7 @@
             d="M17.657 16.657L13 12m-4.243 4.243A6 6 0 1121 9a6.007 6.007 0 01-9.757 7.657z"
           />
         </svg>
-        {{ event.location }}
+        {{ event.venue }}
       </div>
     </div>
 
@@ -59,7 +59,7 @@
     <div class="flex">
       <div class="px-6 py-4">
         <NuxtLink
-          :to="`/events/${event.id}`"
+          :to="`/events/${event.event_id}`"
           class="inline-block bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
           Event Details
