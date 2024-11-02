@@ -60,8 +60,10 @@
 </template>
 
 <script setup>
+import { useMutation } from '@vue/apollo-composable'
 import { ref } from 'vue'
 import ThemeButton from '~/components/ThemeButton.vue'
+import { LOGOUT_MUTATION } from '~/graphql/mutation'
 
 const isDropdownOpen = ref(false)
 
@@ -69,7 +71,10 @@ function toggleDropdown() {
   isDropdownOpen.value = !isDropdownOpen.value
 }
 
-function logout() {
+async function logout() {
+  console.log('logging out')
+  const { mutate } = useMutation(LOGOUT_MUTATION)
+  await mutate()
   // Logic for logging out the user
   console.log('User logged out')
   isDropdownOpen.value = false

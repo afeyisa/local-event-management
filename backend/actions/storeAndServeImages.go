@@ -37,104 +37,113 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 	// Parse the multipart form, which allows file uploads
 	err := r.ParseMultipartForm(10 << 20) // 10MB file limit
 	if err != nil {
-		fmt.Println(err,"at file")
+		fmt.Println(err, "at file")
 		http.Error(w, "Unable to process file", http.StatusBadRequest)
 		return
 	}
 
-	// Get the featured image from the form data
-	file, handler, err := r.FormFile("thumbnailimage")
-	if err != nil {
-		fmt.Println(err,"at tumbna")
-		http.Error(w, "Error retrieving the file", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-
-	// Validate image type
-	if !isImageFile(handler.Filename) {
-		log.Printf("Unsupported file type for featured image: %s", handler.Filename)
-		http.Error(w, "Unsupported file type for featured image", http.StatusBadRequest)
+	// Check if both `thumbnailimage` and `other_images` are missing
+	_, _,thumbnailErr := r.FormFile("thumbnailimage")
+	otherImages := r.MultipartForm.File["other_images"]
+	if thumbnailErr != nil && len(otherImages) == 0 {
+		http.Error(w, "At least one image is required", http.StatusBadRequest)
 		return
 	}
 
-	// Create a file on the server where the image will be stored
-	fileExt := filepath.Ext(handler.Filename) // Get the file extension
-	fileBase := strings.TrimSuffix(handler.Filename, fileExt)
-	filenameinuuid := uuid.New().String()
-	uniqueFileName := fmt.Sprintf("%s_%s%s", fileBase, filenameinuuid, fileExt)
+	var thumbnailURL string
+	// Process the featured image if present
+	if thumbnailErr == nil {
+		file, handler, err := r.FormFile("thumbnailimage")
+		if err == nil {
+			defer file.Close()
 
-	// Create a new file path with the unique filename
-	filePath := filepath.Join(uploadPath, uniqueFileName)
-	dst, err := os.Create(filePath)
-	if err != nil {
-		http.Error(w, "Unable to save the file", http.StatusInternalServerError)
-		return
+			// Validate image type
+			if !isImageFile(handler.Filename) {
+				log.Printf("Unsupported file type for featured image: %s", handler.Filename)
+				http.Error(w, "Unsupported file type for featured image", http.StatusBadRequest)
+				return
+			}
+
+			// Create a unique file name
+			fileExt := filepath.Ext(handler.Filename)
+			fileBase := strings.TrimSuffix(handler.Filename, fileExt)
+			filenameInUUID := uuid.New().String()
+			uniqueFileName := fmt.Sprintf("%s_%s%s", fileBase, filenameInUUID, fileExt)
+
+			// Save the featured image
+			filePath := filepath.Join(uploadPath, uniqueFileName)
+			dst, err := os.Create(filePath)
+			if err != nil {
+				http.Error(w, "Unable to save the file", http.StatusInternalServerError)
+				return
+			}
+			defer dst.Close()
+
+			if _, err := io.Copy(dst, file); err != nil {
+				http.Error(w, "Error saving the file", http.StatusInternalServerError)
+				return
+			}
+			thumbnailURL = fmt.Sprintf("http://localhost:4000/uploads/%s", uniqueFileName)
+		}
 	}
-	defer dst.Close()
 
-	// Copy the file content to the destination file
-	if _, err := io.Copy(dst, file); err != nil {
-		http.Error(w, "Error saving the file", http.StatusInternalServerError)
-		return
-	}
-
-	// Handling other images
+	// Process other images if present
 	var images []string
-	files := r.MultipartForm.File["other_images"] // Access all other images
+	if len(otherImages) > 0 {
+		if len(otherImages) > 4 {
+			log.Println("Too many other images uploaded; max is 4.")
+			http.Error(w, "Too many other images", http.StatusBadRequest)
+			return
+		}
 
-	if len(files) > 4 {
-		log.Println("Too many other images uploaded; max is 4.")
-		http.Error(w, "Too many other images", http.StatusBadRequest)
-		return
+		for i, fileHeader := range otherImages {
+			file, err := fileHeader.Open()
+			if err != nil {
+				log.Printf("Error opening other image %d: %v", i, err)
+				http.Error(w, "Error retrieving other images", http.StatusInternalServerError)
+				return
+			}
+			defer file.Close()
+
+			// Validate image type
+			if !isImageFile(fileHeader.Filename) {
+				log.Printf("Unsupported file type for other image %d: %s", i, fileHeader.Filename)
+				http.Error(w, "Unsupported file type for other images", http.StatusBadRequest)
+				return
+			}
+
+			// Create a unique file name for each other image
+			fileExt := filepath.Ext(fileHeader.Filename)
+			fileBase := strings.TrimSuffix(fileHeader.Filename, fileExt)
+			filenameInUUID := uuid.New().String()
+			uniqueFileName := fmt.Sprintf("%s_%s%s", fileBase, filenameInUUID, fileExt)
+			imagePath := filepath.Join(uploadPath, uniqueFileName)
+			images = append(images, imagePath)
+
+			// Save each other image
+			outFile, err := os.Create(imagePath)
+			if err != nil {
+				log.Printf("Error saving other image %d: %v", i, err)
+				http.Error(w, "Error saving other image", http.StatusInternalServerError)
+				return
+			}
+			defer outFile.Close()
+
+			if _, err := io.Copy(outFile, file); err != nil {
+				log.Printf("Error writing other image %d: %v", i, err)
+				http.Error(w, "Error saving other image", http.StatusInternalServerError)
+				return
+			}
+		}
 	}
 
-	for i, fileHeader := range files {
-		file, err := fileHeader.Open()
-		if err != nil {
-			log.Printf("Error opening other image %d: %v", i, err)
-			http.Error(w, "Error retrieving other images", http.StatusInternalServerError)
-			return
-		}
-
-		// Validate image type
-		if !isImageFile(fileHeader.Filename) {
-			log.Printf("Unsupported file type for other image %d: %s", i, fileHeader.Filename)
-			http.Error(w, "Unsupported file type for other images", http.StatusBadRequest)
-			return
-		}
-
-
-		fileBase := strings.TrimSuffix(handler.Filename, fileExt)
-		filenameinuuid := uuid.New().String()
-		uniqueFileName := fmt.Sprintf("%s_%s%s", fileBase, filenameinuuid, fileExt)
-		imagePath := filepath.Join(uploadPath, uniqueFileName)
-
-		images = append(images, imagePath)
-
-		// Save each other image
-		outFile, err := os.Create(imagePath)
-		if err != nil {
-			log.Printf("Error saving other image %d: %v", i, err)
-			http.Error(w, "Error saving other image", http.StatusInternalServerError)
-			return
-		}
-		if _, err := io.Copy(outFile, file); err != nil {
-			log.Printf("Error writing other image %d: %v", i, err)
-			http.Error(w, "Error saving other image", http.StatusInternalServerError)
-			return
-		}
-		outFile.Close()
-		file.Close()
-	}
-
-	// Generate the URL to access the uploaded images
+	// Create a response map with the URLs
 	response := map[string]interface{}{
-		"thumbnail_image_url": fmt.Sprintf("http://localhost:4000/uploads/%s", uniqueFileName),
-		"other_images_urls":  convertToURLs(images),
+		"thumbnail_image_url": thumbnailURL,
+		"other_images_urls":   convertToURLs(images),
 	}
 
-	// Set response header and send JSON response
+	// Send the JSON response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)

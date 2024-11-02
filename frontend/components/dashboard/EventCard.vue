@@ -1,5 +1,8 @@
 <template>
-  <div class="event-card min-w-md max-h-lg rounded overflow-hidden shadow-lg bg-white dark:bg-gray-900">
+  <div
+    v-if="event"
+    class="event-card min-w-md max-h-lg rounded overflow-hidden shadow-lg bg-white dark:bg-gray-900"
+  >
     <!-- Event Image -->
     <img
       :src="event.thumbnail_image_url ||'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
@@ -12,74 +15,45 @@
       <div class="font-bold text-xl mb-2 dark:text-gray-300">
         {{ event.title }}
       </div>
-      <p class="text-gray-700 text-base dark:text-gray-300">
-        {{ event.description }}
-      </p>
     </div>
 
     <!-- Event Metadata -->
     <div class="px-6 pt-4 pb-2">
       <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-        <svg
-          class="w-4 h-4 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3m8 4V3m-9 8h10m-9 4h10m-9 4h10"
-          />
-        </svg>
+        <i class=" p-2 fa fa-calendar" />
         {{ formatDate(event.event_date) }}
       </div>
       <div class="flex items-center text-sm text-gray-600 dark:text-gray-400 mt-2">
-        <svg
-          class="w-4 h-4 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17.657 16.657L13 12m-4.243 4.243A6 6 0 1121 9a6.007 6.007 0 01-9.757 7.657z"
-          />
-        </svg>
+        <i class="p-2 fa fa-map-marker" />
         {{ event.venue }}
       </div>
     </div>
 
     <!-- Event Actions -->
-    <div class="flex">
-      <div class="px-6 py-4">
+    <div class="flex flex-wrap  ">
+      <div class="px-2 py-2 w-full sm:w-auto ">
         <NuxtLink
           :to="`/events/${event.event_id}`"
-          class="inline-block bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800"
+          class="inline-block bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800 w-full sm:w-auto text-center"
         >
-          Event Details
+          Details
         </NuxtLink>
       </div>
-      <div class="px-6 py-4">
+      <div class="px-2 py-2 w-full sm:w-auto">
         <NuxtLink
-          :to="`/events/${event.id}`"
-          class="inline-block bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800"
+          :to="`/events/${event.event_id}/edit`"
+          class="inline-block bg-yellow-500 text-white px-3 py-2 w-full sm:w-auto text-center rounded hover:bg-yellow-600 dark:bg-yellow-700 dark:hover:bg-yellow-800"
         >
-          Upadte Event
+          Update
         </NuxtLink>
       </div>
-      <div class="px-6 py-4">
-        <NuxtLink
-          :to="`/events/${event.id}/edit`"
-          class="inline-block text-red-500  px-3 py-2 rounded hover:bg-blue-500"
+      <div class="px-2 py-2 w-full sm:w-auto">
+        <button
+          class="inline-block text-red-500  w-full sm:w-auto text-center  border border-red-500 px-3 py-2 rounded"
+          @click="deleteEvent"
         >
-          Delete Event
-        </NuxtLink>
+          Delete
+        </button>
       </div>
     </div>
   </div>
@@ -87,18 +61,46 @@
 
 <script setup>
 // import { computed } from 'vue'
+import { useMutation } from '@vue/apollo-composable'
+import { DELETE_EVENT } from '~/graphql/mutation'
 
-defineProps({
+const prorps = defineProps({
   event: {
     type: Object,
     required: true,
   },
 })
-
+const event = ref(prorps.event)
 // Function to format the date nicely
 const formatDate = (date) => {
   const options = { year: 'numeric', month: 'short', day: 'numeric' }
   return new Date(date).toLocaleDateString(undefined, options)
+}
+
+const deleteEvent = async () => {
+  // Show a confirmation dialog
+  const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
+
+  // Proceed with deletion if the user confirms
+  if (confirmed) {
+    try {
+      const { mutate } = useMutation(DELETE_EVENT)
+      const { data } = await mutate({ event_id: event.value.event_id })
+
+      if (data) {
+        event.value = null
+        alert('Organization deleted successfully.')
+      }
+    }
+    catch (err) {
+      console.log(err)
+      alert('An error occurred while deleting the organization.')
+    }
+  }
+  else {
+    // Action was canceled
+    alert('Deletion canceled.')
+  }
 }
 </script>
 

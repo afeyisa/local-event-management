@@ -1,5 +1,8 @@
 <template>
-  <div class="bg-white dark:bg-gray-900 shadow-md rounded-lg p-4">
+  <div
+    v-if="organization"
+    class="bg-white w-full dark:bg-gray-900 shadow-md rounded-lg p-4"
+  >
     <!-- Organization Profile Photo -->
     <div class="flex items-center dark:text-gray-300 mb-4">
       <img
@@ -27,25 +30,80 @@
     <p class="text-gray-600 dark:text-gray-400">
       <strong>Description:</strong> {{ organization.description || 'No description available.' }}
     </p>
-    <div class="px-6 py-0">
+    <!-- <div class="px-6 py-0">
       <button
-        :to="`/events/${organization.id}/edit`"
-        class="inline-block text-red-500  px-3 py-2 rounded hover:bg-blue-500"
+        class="inline-block text-red-500  px-3 py-2 rounded"
       >
-        Delete Event
+        Delete
       </button>
+    </div> -->
+    <div class="flex">
+      <div class="px-6 py-4">
+        <NuxtLink
+          :to="`/events/organizations/${organization.organization_id}`"
+          class="inline-block bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800"
+        >
+          Details
+        </NuxtLink>
+      </div>
+      <div class="px-6 py-4">
+        <NuxtLink
+          :to="`/events/organizations/${organization.organization_id}/edit`"
+          class="inline-block bg-yellow-500 text-white px-3 py-2 rounded hover:bg-yellow-600 dark:bg-yellow-700 dark:hover:bg-yellow-800"
+        >
+          Update
+        </NuxtLink>
+      </div>
+      <div class="px-6 py-4">
+        <button
+          class="inline-block text-red-500  px-3 py-2 rounded"
+          @click="deleteOrg"
+        >
+          Delete
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { defineProps } from 'vue'
+import { useMutation } from '@vue/apollo-composable'
+import { DELETE_ORG } from '~/graphql/mutation'
 
 // Props to receive organization data
-defineProps({
+const props = defineProps({
   organization: {
     type: Object,
     required: true,
   },
 })
+
+const organization = ref(props.organization)
+
+const deleteOrg = async () => {
+  // Show a confirmation dialog
+  const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
+
+  // Proceed with deletion if the user confirms
+  if (confirmed) {
+    try {
+      const { mutate } = useMutation(DELETE_ORG)
+      const { data } = await mutate({ organization_id: organization.value.organization_id })
+
+      if (data) {
+        organization.value = null
+        alert('Organization deleted successfully.')
+      }
+    }
+    catch (err) {
+      console.log(err)
+      alert('An error occurred while deleting the organization.')
+    }
+  }
+  else {
+    // Action was canceled
+    alert('Deletion canceled.')
+  }
+}
 </script>

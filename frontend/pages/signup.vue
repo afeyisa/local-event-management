@@ -3,22 +3,20 @@
     <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
       Signup
     </h2>
-    <Form
-      @submit="onSummit"
-    >
+    <Form @submit="onSummit">
       <!-- email input -->
       <div class="mb-4">
         <label
           class="block text-gray-700 dark:text-gray-300 mb-2"
           for="email"
-        >Email
+        >
+          <i class="fa fa-envelope text-gray-400 dark:text-gray-200 mr-2" />Email
         </label>
         <Field
           v-model="email"
           rules="validateEmail"
           type="email"
           name="email"
-          r
           class="mt-1 block w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline focus:outline-1 focus:outline-blue-500 focus:outline-none"
           placeholder="Enter your email"
         />
@@ -27,13 +25,14 @@
           name="email"
         />
       </div>
+
       <!-- password input -->
       <div class="mb-4">
         <label
           for="password"
           class="block text-gray-700 dark:text-gray-300 mb-2"
         >
-          Password
+          <i class="fa fa-lock text-gray-400 dark:text-gray-200 mr-2" />Password
         </label>
         <Field
           v-model="password"
@@ -48,12 +47,14 @@
           name="password"
         />
       </div>
+
+      <!-- confirm password input -->
       <div class="mb-4">
         <label
+          for="confirm_password"
           class="block text-gray-700 dark:text-gray-300 mb-2"
-          for="confirm password"
         >
-          Confirm Password
+          <i class="fa fa-lock text-gray-400 dark:text-gray-200 mr-2" />Confirm Password
         </label>
         <Field
           name="confirmation"
@@ -62,22 +63,23 @@
           rules="confirmed:password"
           class="mt-1 block w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline focus:outline-1 focus:outline-blue-500 focus:outline-none"
         />
+        <ErrorMessage
+          class="text-red-500 mb-4"
+          name="confirmation"
+        />
       </div>
-      <ErrorMessage
-        class="text-red-500 mb-4"
-        name="confirmation"
-      />
 
       <button
         :disabled="loading"
-        class="w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
+        class="flex items-center justify-center w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
       >
+        <i class="fa fa-user-plus mr-2" /> <!-- Add the signup icon -->
         Signup
       </button>
     </Form>
     <div
       v-if="error"
-      class=" text-red-500 mb-4"
+      class="text-red-500 mb-4"
     >
       {{ error.message }}
     </div>
@@ -102,7 +104,6 @@ const limit = 5
 
 definePageMeta({
   layout: 'auth',
-  middleware: 'auth',
 })
 //* ***********validation ********************************/
 defineRule('validateEmail', (value) => {

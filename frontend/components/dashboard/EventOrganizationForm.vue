@@ -1,7 +1,7 @@
 <template>
   <div class="p-8 dark:bg-gray-800 dark:text-gray-300">
     <h1 class="text-3xl font-bold mb-6">
-      Create  Organization
+      {{ id?'update organization':' Create  Organization' }}
     </h1>
 
     <!-- Form -->
@@ -71,7 +71,6 @@
         <Field
           id="bio"
           v-model="formData.bio"
-          rules="required"
           name="bio"
           type="text"
           class="mt-1 block w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline focus:outline-1 focus:outline-blue-500 focus:outline-none"
@@ -101,7 +100,7 @@
         type="submit"
         class="px-4 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700"
       >
-        Create Organization
+        {{ id?'Update ':'create' }}
       </button>
     </Form>
 
@@ -124,16 +123,18 @@
 </template>
 
 <script setup>
-// Import necessary modules and functions
 import { ref } from 'vue'
 import { useMutation } from '@vue/apollo-composable'
 import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
-import { CREATE_ORGANIZATION } from '~/graphql/mutation'
+import { CREATE_ORGANIZATION, UPDATE_ORGANIZATION } from '~/graphql/mutation'
+import { apolloClient } from '~/plugins/apollo'
+import { GET_ORGANIZATIONS } from '~/graphql/queries'
 
-// Define the layout and authentication middleware
-definePageMeta({
-  layout: 'mydashboard',
-  middleware: 'auth',
+const { id } = defineProps({
+  id: {
+    type: String,
+    required: false,
+  },
 })
 
 defineRule('required', (value) => {
@@ -151,12 +152,22 @@ const formData = ref({
   description: ref(''),
 })
 
+if (id) {
+  try {
+    const { data } = await apolloClient.query({ query: GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: id } } } })
+    formData.value.organization_name = data.data_organizations[0].organization_name
+    formData.value.bio = data.data_organizations[0].bio
+    formData.value.description = data.data_organizations[0].description
+  }
+  catch {
+    /** */
+  }
+}
 // Success and error messages
 const successMessage = ref('')
 const errorMessage = ref('')
 
 // Create or update mutation setup
-const { mutate: createOrganization } = useMutation(CREATE_ORGANIZATION)
 const handleSubmit = async () => {
   try {
     // upload profile image
@@ -171,25 +182,33 @@ const handleSubmit = async () => {
       if (response.ok) {
         const { thumbnail_image_url } = await response.json()
         profile_photo_url = thumbnail_image_url
-        // console.log(thumbnail_image_url)
       }
     }
-    console.log(profile_photo_url)
+
+    if (id) {
+      const { mutate: createOrganization } = useMutation(UPDATE_ORGANIZATION)
+      const { data } = await createOrganization({
+        organization_name: formData.value.organization_name,
+        profile_photo_url: profile_photo_url,
+        bio: formData.value.bio,
+        description: formData.value.description,
+        organization_id: id,
+      })
+      const router = useRouter()
+      console.log(data)
+      router.push(`/events/organizations/${data.update_data_organizations_by_pk.organization_id}`)
+    }
+    else {
     // create organization
-    const data = await createOrganization({
-      organization_name: formData.value.organization_name,
-      profile_photo_url: profile_photo_url,
-      bio: formData.value.bio,
-      description: formData.value.description,
-    })
-    successMessage.value = 'Organization created successfully!'
-    console.log(data)
-    // Reset the form
-    formData.value = {
-      organization_name: '',
-      profile: null,
-      bio: '',
-      description: '',
+      const { mutate: createOrganization } = useMutation(CREATE_ORGANIZATION)
+      const { data } = await createOrganization({
+        organization_name: formData.value.organization_name,
+        profile_photo_url: profile_photo_url,
+        bio: formData.value.bio,
+        description: formData.value.description,
+      })
+      const router = useRouter()
+      router.push(`/events/organizations/${data.insert_data_organizations_one.organization_id}`)
     }
   }
   catch (error) {

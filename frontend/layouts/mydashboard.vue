@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col nin-h-screen">
     <!-- Header -->
     <header class="bg-blue-500 text-white p-4 dark:bg-gray-800 sticky top-0 z-10 shadow-md">
-      <nav class="container mx-auto flex justify-between items-center">
+      <nav class="container mx-auto flex justify-between items-center flex-wrap">
         <div class="text-lg font-bold">
           <NuxtLink
             to="/"
@@ -11,90 +11,181 @@
             Event Manager
           </NuxtLink>
         </div>
-        <div class="flex items-center space-x-4">
-          <ThemeButton class="mr-4" />
+        <button
+          class="md:hidden text-white focus:outline-none"
+          @click="toggleSidebar"
+        >
+          <i class="fa fa-bars" />
+        </button>
+
+        <div class="hidden md:flex items-center space-x-4">
           <NuxtLink
             to="/events/create"
-            class="hover:underline"
+            class="hover:underline  dark:hover:text-blue-500"
           >
+            <i class="fa fa-plus dark:text-blue-500" />
             Create Event
           </NuxtLink>
+          <ThemeButton class="mr-4" />
         </div>
       </nav>
     </header>
-
-    <!-- Main Content (Dashboard Layout) -->
-    <main class="flex flex-1">
-      <!-- Left Sidebar -->
-      <aside class="w-1/4 text-xl min-h-screen  bg-gray-100 p-4 dark:bg-gray-700 shadow-md">
-        <ul class="space-y-4 pl-10">
+    <aside
+      :class="['fixed inset-0 rounded-sm bg-gray-800 bg-opacity-75 transition-opacity', { hidden: !isSidebarOpen }]"
+      @click="toggleSidebar"
+    >
+      <div class="absolute rounded-md right-0 w-64 bg-white dark:bg-gray-800 shadow-lg p-6">
+        <ul class="space-y-4">
           <li>
             <NuxtLink
               to="/"
-              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500"
+              class="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-500"
             >
-              Home
+              <i class="fa fa-home text-blue-500" /> Home
             </NuxtLink>
           </li>
-
           <li>
             <NuxtLink
               to="/events"
-              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500"
+              class="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-500"
             >
-              My Events
+              <i class="fa fa-calendar text-blue-500" /> My Events
             </NuxtLink>
           </li>
           <li>
             <NuxtLink
-              to="/bookmarks"
-              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500"
+              to="/events/bookmarks"
+              class="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-500"
             >
-              Bookmarks
+              <i class="fa fa-bookmark text-blue-500" /> Bookmarks
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink
+              to="/events/following"
+              class="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-500"
+            >
+              <i class="fa fa-user text-blue-500" /> Following
             </NuxtLink>
           </li>
           <li>
             <NuxtLink
               to="/events/organizations"
-              class="ext-gray-700 dark:text-white font-semibold hover:text-blue-500"
+              class="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-500"
             >
-              Organizations
+              <i class="fa fa-building text-blue-500" /> Organizations
             </NuxtLink>
           </li>
           <li>
             <NuxtLink
               to="/events/create"
-              class="ext-gray-700 dark:text-white font-semibold hover:text-blue-500 "
+              class="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-500"
             >
-              Create Event
+              <i class="fa fa-plus text-blue-500" /> Create Event
             </NuxtLink>
           </li>
           <li>
             <NuxtLink
               to="/events/organizations/create"
-              class="ext-gray-700 dark:text-white font-semibold hover:text-blue-500 "
+              class="flex items-center space-x-2 text-gray-700 dark:text-white hover:text-blue-500 dark:hover:text-blue-500"
+            >
+              <i class="fa fa-plus text-blue-500" /> Create Organizations
+            </NuxtLink>
+          </li>
+          <li>
+            <DashboardLogoutButton />
+          </li>
+          <ThemeButton class="mr-4" />
+        </ul>
+      </div>
+    </aside>
+
+    <main class="flex flex-1 min-h-screen">
+      <!-- Left Sidebar -->
+      <aside
+        class="w-1/4 text-xl  bg-gray-100 p-4 dark:bg-gray-700 shadow-md hidden md:block"
+      >
+        <ul class="space-y-4  pl-10">
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-home text-blue-500" />
+
+            <NuxtLink
+              to="/"
+              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500"
+            >
+              Home
+            </NuxtLink>
+          </li>
+
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-calendar text-blue-500" />
+
+            <NuxtLink
+              to="/events"
+              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500"
+            >
+              My Events
+            </NuxtLink>
+          </li>
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-bookmark text-blue-500" />
+            <NuxtLink
+              to="/events/bookmarks"
+              class=" text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500"
+            >
+              Bookmarks
+            </NuxtLink>
+          </li>
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-user text-blue-500" />
+            <NuxtLink
+              to="/events/following"
+              class=" text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500"
+            >
+              Following
+            </NuxtLink>
+          </li>
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-building text-blue-500" />
+            <NuxtLink
+              to="/events/organizations"
+              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500"
+            >
+              Organizations
+            </NuxtLink>
+          </li>
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-plus text-blue-500" />
+
+            <NuxtLink
+              to="/events/create"
+              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500 "
+            >
+              Create Event
+            </NuxtLink>
+          </li>
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-plus text-blue-500" />
+
+            <NuxtLink
+              to="/events/organizations/create"
+              class="text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500 "
             >
               Create Organizations
             </NuxtLink>
           </li>
-          <li>
-            <NuxtLink
-              to="/settings"
-              class="text-gray-700  dark:text-white font-semibold hover:text-blue-500"
-            >
-              Settings
-            </NuxtLink>
-          </li>
-          <li>
-            <button class="w-full text-left px-4 py-2  dark:text-white dark:hover:text-red-600 hover:text-red-600 hover:underline ">
-              Logout
-            </button>
+          <li class="flex items-center space-x-2 ">
+            <i class="fa fa-sign-out text-blue-500" />
+
+            <DashboardLogoutButton />
           </li>
         </ul>
       </aside>
 
       <!-- Right Content Area -->
-      <section class="w-3/4 p-6 bg-white dark:bg-gray-800">
+      <section
+        class="w-full  md:w-3/4 p-6 bg-white dark:bg-gray-800"
+      >
         <NuxtPage />
       </section>
     </main>
@@ -105,3 +196,13 @@
     </footer>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+
+const isSidebarOpen = ref(false)
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+</script>

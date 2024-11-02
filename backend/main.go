@@ -24,6 +24,7 @@ func main() {
 
 	// Handle the upload request
 	
+	
 	mux := http.NewServeMux()
  	mux.HandleFunc("/login", actions.LoginHandler)
   	mux.HandleFunc("/register",actions.RegisterHandler)
@@ -32,6 +33,8 @@ func main() {
 	mux.HandleFunc("/protectpageroute",actions.ProtectPageRoute)
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads/"))))
 	mux.HandleFunc("/upload", actions.UploadImage)
+	mux.HandleFunc("/tickectcheckout", actions.Ticketcheckout)
+
 	// mux.HandleFunc("/uploads",actions.ServeImage)
 	err = http.ListenAndServe(":4000", mux)
 	log.Fatal(err)

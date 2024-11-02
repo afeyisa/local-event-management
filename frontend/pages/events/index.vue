@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
+    <div v-if="loading">
+      <LoadingFallback />
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Loop through the events array and pass each event as a prop to EventCard -->
       <EventCard
         v-for="event in events"
@@ -13,12 +16,17 @@
 
 <script setup>
 import EventCard from '~/components/dashboard/EventCard.vue'
-import { GET_EVENT_SAMPLE } from '~/graphql/queries'
+import { GET_MY_EVENTS, GET_MY_ID } from '~/graphql/queries'
 import { apolloClient } from '~/plugins/apollo'
 
-const { data } = await apolloClient.query({ query: GET_EVENT_SAMPLE })
-// console.log(data)
-const events = data.data_events
+const { data: userData, loading, error } = await apolloClient.query({ query: GET_MY_ID })
+const events = ref([])
+if (!loading && !error) {
+  const myId = userData.data_users[0].user_id
+  const { data } = await apolloClient.query({ query: GET_MY_EVENTS, variables: { where: { organization: { organizes: { user: { user_id: { _eq: myId } } } } } } })
+  events.value = data.data_events
+}
+
 definePageMeta({
   layout: 'mydashboard',
   middleware: 'auth',

@@ -4,6 +4,7 @@
     <!-- <NavBar class="sticky top-0 z-10 shadow-md" /> -->
 
     <main class="min-h-screen dark:bg-gray-700 shadow-md">
+      <!-- <SearchFilters/> -->
       <NuxtPage />
     </main>
 

@@ -19,7 +19,9 @@ CREATE TABLE data.organizations (
   profile_photo_url text,
   bio varchar,
   description text,
+  followers int DEFAULT 0
   created_at timestamp DEFAULT CURRENT_TIMESTAMP
+  CHECK(followers >= 0))
 );
 
 CREATE TABLE data.follows (
@@ -47,7 +49,6 @@ CREATE TABLE categories (
   category_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   category_name varchar NOT NULL
 );
-
 
 CREATE TABLE data.images (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -80,8 +81,8 @@ CREATE TABLE data.event_tags (
 );
 
 CREATE TABLE data.bookmarks (
-  book_marked_event_id uuid NOT NULL,
-  book_marker_user_id uuid NOT NULL,
+  book_marked_event_id uuid unique NOT NULL,
+  book_marker_user_id uuid unique NOT NULL,
   PRIMARY KEY (book_marked_event_id, book_marker_user_id)
 );
 
@@ -106,8 +107,6 @@ CREATE TABLE data.notifications (
   is_read boolean,
   created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
-
-
 
 ALTER TABLE data.categories
   ADD CONSTRAINT unique_category_name UNIQUE (category_name);
@@ -167,49 +166,35 @@ ADD FOREIGN KEY (transaction_no) REFERENCES data.payments (transaction_no);
 ALTER TABLE data.notifications 
 ADD FOREIGN KEY (user_id) REFERENCES data.users (user_id);
 
+CREATE OR REPLACE FUNCTION data.increase_followers()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE data.organizations
+  SET followers = followers + 1
+  WHERE organization_id = NEW.followed_organization_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- Insert categories
-INSERT INTO categories (category_name) VALUES
-  ( 'Technology'),
-  ( 'Music'),
-  ( 'Education'),
-  ( 'Sports'),
-  ( 'Art'),
-  ( 'Health'),
-  ( 'Business'),
-  ( 'Entertainment'),
-  ( 'Science'),
-  ( 'Travel');
+CREATE OR REPLACE FUNCTION data.decrease_followers()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE data.organizations
+  SET followers = followers - 1
+  WHERE organization_id = OLD.followed_organization_id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
 
--- populating events if catagory id don't known
-  INSERT INTO events (
-  event_id, 
-  by_organization_id, 
-  title, 
-  ticket_price, 
-  total_available_tickets, 
-  event_date, 
-  category_id, 
-  description, 
-  venue, 
-  is_online, 
-  thumnail_image_url, 
-  created_at
-) 
-VALUES (
-  uuid_generate_v4(),  -- Generates a new unique event_id
-  'c5b8efdc-5f65-4ef8-95e5-7f4edb789c24',  -- Organization ID
-  'Music Festival 2024',  -- Event title
-  75.00,  -- Ticket price
-  1000,  -- Total available tickets
-  '2024-11-05',  -- Event date
-  (SELECT category_id FROM categories WHERE category_name = 'Music'),  -- Subquery to get category_id
-  'A grand music festival with live performances from top artists.',  -- Description
-  'Central Park, New York',  -- Venue
-  false,  -- is_online (false = in-person)
-  'https://example.com/music-festival-thumbnail.jpg',  -- Thumbnail image URL
-  NOW()  -- Created at (current timestamp)
-);
+CREATE TRIGGER increase_followers_trigger
+AFTER INSERT ON data.follows
+FOR EACH ROW
+EXECUTE FUNCTION data.increase_followers();
+
+CREATE TRIGGER decrease_followers_trigger
+AFTER DELETE ON data.follows
+FOR EACH ROW
+EXECUTE FUNCTION data.decrease_followers();
 
 
 CREATE OR REPLACE FUNCTION data.get_user_organizations(user_id uuid)
@@ -219,82 +204,6 @@ RETURNS SETOF uuid AS $$
   WHERE organizer_id = user_id;
 $$ LANGUAGE sql STABLE;
 DROP FUNCTION IF EXISTS data.get_user_organizations(uuid);
-
-
-
-query BrowseEvents(
-  $location: String, 
-  $start_date: date, 
-  $end_date: date, 
-  $category_id: uuid, 
-  $min_price: numeric, 
-  $max_price: numeric
-) {
-  events(
-    where: {
-      _and: [
-        { is_public: { _eq: true } },  # Only show public events
-        { venue: { _ilike: $location } },  # Filter by location (partial match)
-        { event_date: { _gte: $start_date } },  # Filter events starting from a specific date
-        { event_date: { _lte: $end_date } },  # Filter events until a specific date
-        { category_id: { _eq: $category_id } },  # Filter by category
-        { ticket_price: { _gte: $min_price } },  # Filter events with price >= min_price
-        { ticket_price: { _lte: $max_price } }  # Filter events with price <= max_price
-      ]
-    },
-    order_by: { event_date: asc },  # Sort events by date
-  ) {
-    event_id
-    title
-    event_date
-    ticket_price
-    description
-    venue
-    category {
-      category_name
-    }
-    thumbnail_image_url
-  }
-}
-
-CREATE TYPE data.organize_result AS (
-    organization_id uuid,
-    organizer_id uuid
-);
-
-DROP FUNCTION IF EXISTS data.insert_into_organizes();
-CREATE OR REPLACE FUNCTION data.insert_into_organizes()
-RETURNS TABLE(organization_id uuid, organizer_id uuid)
-LANGUAGE plpgsql
-AS $function$
-DECLARE
-    user_id uuid;
-BEGIN
-    -- Fetch the user_id (organizer_id) dynamically from the users table or JWT session
-    SELECT user_id INTO user_id
-    FROM data_users
-    WHERE user_id = current_setting('hasura.user')::uuid;
-
-    -- Insert into data_organizes using the fetched user_id and the new organization_id
-    INSERT INTO data.data_organizes (organization_id, organizer_id)
-    VALUES (NEW.organization_id, user_id);
-
-    -- Return the inserted data as a table
-    RETURN QUERY SELECT NEW.organization_id, user_id;
-END;
-$function$;
-
-
-
-CREATE TRIGGER after_organization_insert
-AFTER INSERT ON data.organizations
-FOR EACH ROW
-EXECUTE FUNCTION data.insert_into_organizes();
-
-
-DROP TRIGGER after_organization_insert ON data.organizations;
-DROP FUNCTION IF EXISTS data.insert_into_organizes();
-
 
 DROP FUNCTION IF EXISTS data.insert_into_organizes();
 CREATE OR REPLACE FUNCTION data.insert_into_organizes()
@@ -323,3 +232,6 @@ AFTER INSERT ON data.organizations
 FOR EACH ROW
 EXECUTE FUNCTION data.insert_into_organizes();
 
+CREATE VIEW data.PublicEvents AS
+SELECT *
+FROM data.events;

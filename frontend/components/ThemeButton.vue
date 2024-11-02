@@ -11,11 +11,17 @@
       <span
         v-if="theme === 'dark'"
         class="text-yellow-500"
-      >🌞</span>
+      ><i
+        class="fa fa-sun-o"
+        aria-hidden="true"
+      /></span>
       <span
         v-else
-        class="text-gray-200"
-      >🌜</span>
+        class="text-gray-600"
+      ><i
+        class="fa fa-moon-o"
+        aria-hidden="true"
+      /></span>
     </button>
   </div>
 </template>

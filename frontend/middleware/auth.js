@@ -10,12 +10,10 @@ export default defineNuxtRouteMiddleware(async (req) => {
     // Check if the response is correct
     if (!data || !data.isAuthenticated) {
       localStorage.setItem('redirect', req.fullPath)
-      // Redirect to login if not authenticated
-      return router.push('/login')
+      return navigateTo('/login')
     }
   }
   catch (error) {
     return router.push('/loadingfallback')
   }
 })
-

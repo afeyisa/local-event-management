@@ -25,6 +25,7 @@ type GraphqlResponse struct {
 	Errors []GraphQLError `json:"errors"`
 }
 
+
 type GraphQLRequest struct {
 	Query string `json:"query"`
 }

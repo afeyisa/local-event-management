@@ -1,18 +1,16 @@
-<!-- login -->
 <template>
   <div>
     <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
       Login
     </h2>
-    <Form
-      @submit="onLogin"
-    >
+    <Form @submit="onLogin">
       <!-- email input -->
       <div class="mb-4">
         <label
           class="block text-gray-700 dark:text-gray-300 mb-2"
           for="email"
-        >Email
+        >
+          <i class="fa fa-envelope text-gray-400 dark:text-gray-200 mr-2" />Email
         </label>
         <Field
           v-model="email"
@@ -27,13 +25,14 @@
           name="email"
         />
       </div>
+
       <!-- password input -->
       <div class="mb-4">
         <label
           for="password"
           class="block text-gray-700 dark:text-gray-300 mb-2"
         >
-          Password
+          <i class="fa fa-lock text-gray-400 dark:text-gray-200 mr-2" />Password
         </label>
         <Field
           v-model="password"
@@ -51,14 +50,15 @@
 
       <button
         :disabled="loading"
-        class="w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
+        class="flex items-center justify-center w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
       >
+        <i class="fa fa-sign-in mr-2" /> <!-- Add the login icon -->
         Login
       </button>
     </Form>
     <div
       v-if="error"
-      class=" text-red-500 mb-4"
+      class="text-red-500 mb-4"
     >
       {{ error.message }}
     </div>
@@ -68,7 +68,7 @@
         to="/signup"
         class="text-blue-500 hover:underline dark:text-blue-400"
       >
-        Already have an account? Log in
+        Don't have an account? Sign up
       </NuxtLink>
     </div>
   </div>
@@ -81,11 +81,10 @@ import { LOGIN_MUTATION } from '~/graphql/mutation'
 
 definePageMeta({
   layout: 'auth',
-  middleware: 'logedinautoaedirector',
+  // middleware: 'logedinautoaedirector',
 })
 
 defineRule('validateEmail', (value) => {
-  return true
   if (!value || !value.length) {
     return 'Email is required'
   }
@@ -105,8 +104,6 @@ defineRule('required', (value) => {
 
 const email = ref('')
 const password = ref('')
-// const router = useRouter()
-
 const { mutate, loading, error } = useMutation(LOGIN_MUTATION)
 const onLogin = async () => {
   try {
@@ -117,7 +114,6 @@ const onLogin = async () => {
     )
     const redirectPath = localStorage.getItem('redirect') || '/events' // get the redirect path from query or default to root
     localStorage.removeItem('redirect')
-    // router.push(redirectPath)
     window.location.href = window.location.origin + redirectPath
   }
   catch {

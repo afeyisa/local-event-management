@@ -37,6 +37,7 @@ func CheckPasswordHash(password, hash string) error{
 
 //**************authentication with JWT*******************************************************
 func MakeJWT(userID uuid.UUID, tokenSecret []byte, expiresIn time.Duration) (string, error) {
+	
 	claims := &jwt.RegisteredClaims{
 		Issuer:    "local-event-management",
 		IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
