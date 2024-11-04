@@ -9,8 +9,8 @@ import (
 )
 
 func ProtectPageRoute(w http.ResponseWriter, r *http.Request) {
-		// Get the JWT token from the cookies
 
+		// Get the JWT token from the cookies
 		c, err :=r.Cookie("jwttoken")
 		if  c.String() == "" || err != nil {
 			w.WriteHeader(http.StatusOK)       

@@ -1,19 +1,14 @@
-<!-- eslint-disable indent -->
 <template>
   <div>
-    <header class="bg-blue-500  sticky top-0 z-10 shadow-md text-white p-4 dark:bg-gray-800">
-      <!-- Navigation Bar -->
+    <header class="bg-blue-500  sticky top-0 z-20 shadow-md text-white p-4 dark:bg-gray-800">
       <nav class="container mx-auto flex justify-between items-center">
-        <!-- Logo / Branding -->
         <div class="hidden md:block text-lg font-bold">
           <NuxtLink to="/">
             Event Manager
           </NuxtLink>
-          <!-- <li class="flex items-center space-x-2 "> -->
         </div>
 
         <div class="w-full md:w-1/3 flex justify-center items-center">
-          <!-- Search Bar -->
           <div class=" flex items-center   space-x-2 md:w-full">
             <button
               v-if="isSearching"
@@ -49,109 +44,60 @@
           <div
             class="absolute rounded-md right-0 w-64 bg-blue-500 dark:bg-gray-800 shadow-lg p-6"
           >
-            <ul class="flex items-center space-x-4">
-              <!-- Conditional Rendering based on user login status -->
-              <li>
-                <NuxtLink
-                  to="/events"
-                  class="hover:underline"
-                >
-                  <i class="fa fa-calendar " />
-                  My Events
-                </NuxtLink>
-              </li>
-              <li v-show="!isLoggedIn">
-                <NuxtLink
-                  to="/login"
-                  class="hover:underline"
-                >
-                  <i class="fa fa-sign-in" />
-                  Login
-                </NuxtLink>
-              </li>
-              <li v-show="!isLoggedIn">
-                <NuxtLink
-                  to="/signup"
-                  class="hover:underline"
-                ><i class="fa fa-user-plus" />
-                  Signup
-                </NuxtLink>
-              </li>
-              <ThemeButton />
-            </ul>
+            <PublicHeader />
           </div>
         </div>
-        <!-- Navigation Links -->
         <div class="hidden md:block">
           <div class=" relative  flex  items-center space-x-4 ">
-            <ul class="flex items-center space-x-4">
-              <!-- Conditional Rendering based on user login status -->
-              <li>
-                <NuxtLink
-                  to="/events"
-                  class="hover:underline"
-                >
-                  <i class="fa fa-calendar " />
-                  My Events
-                </NuxtLink>
-              </li>
-              <li v-show="!isLoggedIn">
-                <NuxtLink
-                  to="/login"
-                  class="hover:underline"
-                >
-                  <i class="fa fa-sign-in" />
-                  Login
-                </NuxtLink>
-              </li>
-              <li v-show="!isLoggedIn">
-                <NuxtLink
-                  to="/signup"
-                  class="hover:underline"
-                ><i class="fa fa-user-plus" />
-                  Signup
-                </NuxtLink>
-              </li>
-            </ul>
-            <ThemeButton />
+            <PublicHeader />
           </div>
         </div>
       </nav>
     </header>
 
     <div class="flex flex-col">
-      <!-- Content area: either default content or search results -->
       <div class="flex-grow flex overflow-hidden">
-        <!-- Default content displayed if no search results yet -->
         <div
           v-if="!isSearching"
           class="w-full p-4 overflow-y-auto"
         >
-          <h2 class="text-2xl font-bold mb-4">
-            Featured Events
+          <section
+            class="text-center py-12 mb-12 bg-gradient-to-r from-blue-400 to-blue-700 text-white rounded-lg shadow-lg mt-1 w-full"
+          >
+            <h2 class=" sm:text-5xl text-3xl  font-extrabold mb-4">
+              Welcome to events
+            </h2>
+            <p class="sm:text-xl text-2xl ">
+              where you can browse events near by you, create and post events
+            </p>
+          </section>
+
+          <!-- <h2 class="text-2xl text-center text-gray-700 dark:text-white font-bold mb-4">
+            Recent Events
           </h2>
 
-          <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          <div
+            class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6"
+          >
             <PublicEventCard
               v-for="event in events"
               :key="event.id"
               :event="event"
+              @eventid="handleEventId"
+              @orgid="handleOrgid"
             />
-          </div>
+          </div> -->
         </div>
 
-        <!-- Search result layout when searching -->
         <div
           v-if="isSearching"
           class="flex w-full text-xl min-h-screen  bg-gray-100 p-4 dark:bg-gray-700 shadow-md"
         >
-          <!-- Filters on the left (scrollable) -->
           <template v-if="!isOrgDetail && !isEventDetail">
             <div
-              :class="!isFilterOpen? 'hidden md:block flex   w-72 bg-gray-100 p-4 overflow-y-auto text-xl min-h-screen dark:bg-gray-700 shadow-md':'fixed inset-0  bg-opacity-100 transition-opacityabsolute rounded-md right-0 w-64 bg-white dark:bg-gray-800 shadow-lg p-6'"
-              @mousedown="initResize"
+              :class="!isFilterOpen? 'hidden md:block flex rounded-sm w-72 bg-gray-100 z-10 p-4 overflow-y-auto text-xl min-h-screen dark:bg-gray-800 shadow-md':'fixed inset-0 z-10 bg-opacity-100 transition-opacityabsolute mt-20 rounded-md right-0 w-64 bg-white dark:bg-gray-800 shadow-lg p-6'"
             >
-              <div class=" text-gray-700 dark:text-white font-semibold  ">
+              <div class=" text-gray-700 dark:text-white font-semibold ">
                 <h2 class="text-xl font-bold mb-4 text-gray-700 dark:text-white">
                   Filters
                 </h2>
@@ -282,8 +228,6 @@
                   map
                 </h2>
               </div>
-
-              <!-- <button class="w-1 cursor-ew-resize bg-slate-200" /> -->
             </div>
             <div
               class="flex-grow p-4 overflow-y-auto"
@@ -306,9 +250,9 @@
               </div>
               <div
                 v-else
-                class="flex justify-center w-full"
+                class="flex justify-center w-full "
               >
-                <MapPicker :events="events" />
+                <MapPicker :events="events" class="z-0"/>
               </div>
             </div>
           </template>
@@ -406,7 +350,7 @@ const onSearch = async (whereClause) => {
     }
     catch (err) {
       console.log(err)
-    /** empty */
+    /** */
     }
   }
   else {
@@ -421,7 +365,7 @@ const onSearch = async (whereClause) => {
     }
     catch (err) {
       console.log(err)
-    /** empty */
+    /**  */
     }
   }
 }
@@ -540,6 +484,20 @@ const filter = () => {
   events.value = null
   onSearch(whereClause)
 }
+onMounted(async ( )=> {
+  try {
+      const { data } = await apolloClient.query({
+        query: PUBLIC_BROWSEEVENTS,
+        variables: { where: {},limit:10 },
+      })
+      events.value = data.data_events
+    // console.log(events.value)
+    }
+    catch (err) {
+      console.log(err)
+    /**  */
+    }
+})
 
 const setIsevent = ()=>{
   isEventDetail.value = false
@@ -560,22 +518,4 @@ const toggleDate = () => {
   isDateToggleDown.value = !isDateToggleDown.value
 }
 
-// resizers
-const initResize = (event) => {
-  const div = event.target.parentElement
-  const startX = event.clientX
-  const startWidth = div.offsetWidth
-
-  const doDrag = (e) => {
-    div.style.width = `${startWidth + e.clientX - startX}px`
-  }
-
-  const stopDrag = () => {
-    document.removeEventListener('mousemove', doDrag)
-    document.removeEventListener('mouseup', stopDrag)
-  }
-
-  document.addEventListener('mousemove', doDrag)
-  document.addEventListener('mouseup', stopDrag)
-}
 </script>

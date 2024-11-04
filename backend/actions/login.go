@@ -159,7 +159,6 @@ func fetchHashedPasswordWithId(email string) (GraphqlResponse, error) {
 		return res, fmt.Errorf("failed to read user data")
 	}
 
-	// bad request
 	if err := json.Unmarshal(respBody, &res); err != nil {
 		return res, fmt.Errorf("failed to unmarshal user data")
 	}

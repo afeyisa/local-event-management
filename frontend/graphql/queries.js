@@ -1,5 +1,3 @@
-// hel
-
 import { gql } from 'graphql-tag'
 
 export const CHECK_AUTH_QUERY = gql`
@@ -45,7 +43,6 @@ export const PUBLIC_GET_ORGANIZATIONS = gql`
     }
   }
 `
-// when creating event or for event form
 export const GET_ORGANIZATIONS_MY_ORG = gql`
   query getMyorgs($where:data_organizations_bool_exp!){
     data_organizations(where:$where)
@@ -54,6 +51,7 @@ export const GET_ORGANIZATIONS_MY_ORG = gql`
       organization_name
     }
   }`
+
 export const GET_CATAGORIES = gql`
   query{
     data_categories {
@@ -204,8 +202,10 @@ export const BROWSEEVENTS = gql`
 `
 
 export const PUBLIC_BROWSEEVENTS = gql`
- query SearchEventsByTitle($where: data_events_bool_exp!) {
-    data_events(where: $where) {
+ query SearchEventsByTitle(
+  $where: data_events_bool_exp!
+  $limit:Int) {
+    data_events(where: $where,limit: $limit) {
       event_id
       title
       description

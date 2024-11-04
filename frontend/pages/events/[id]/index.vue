@@ -1,8 +1,5 @@
-<!-- event detail page -->
-
 <template>
   <div class="min-w-md max-h-lg rounded overflow-hidden shadow-lg text-gray-700 text-base dark:text-gray-300 bg-white dark:bg-gray-900">
-    <!-- Event Image -->
     <div
       v-if="loading"
       class="text-center py-8"
@@ -20,14 +17,12 @@
       class="max-w-4xl mx-auto p-6 bg-white rounded-lg s min-w-md max-h-lg  overflow-hidden shadow-lg text-gray-700 text-base dark:text-gray-300  dark:bg-gray-900"
     >
       <GoBack />
-      <!-- Event Image -->
       <h1 class="text-3xl font-bold mb-4 dark:text-gray-300 ">
         {{ event.title }}
       </h1>
       <div
         class="relative"
       >
-        <!-- Left Arrow -->
         <button
           v-if="currentImageIndex > 0 && Array.isArray(event.images) && event.images.length > 0"
           class="absolute left-0 top-1/2 transform -translate-y-1/2"
@@ -36,7 +31,6 @@
           <i :class="(currentImageIndex > 0 && Array.isArray(event.images) && event.images.length > 0)?'fa fa-chevron-left dark:text-gray-500 text-gray-800 p-2 text-xl':''" />
         </button>
 
-        <!-- Main Image Display -->
         <img
           v-if="Array.isArray(event.images) && event.images.length > 0 && event.images[currentImageIndex]?.image_url"
           :src="event.images[currentImageIndex].image_url"
@@ -44,7 +38,6 @@
           class="w-full h-64 object-cover rounded-md mb-6"
         >
 
-        <!-- Right Arrow -->
         <button
           v-if="currentImageIndex < event.images.length - 1 && Array.isArray(event.images) && event.images.length > 0"
           class="absolute right-0 top-1/2 transform -translate-y-1/2"
@@ -65,13 +58,7 @@
         <li><i class=" p-2 fa fa-calendar" />Date {{ event.event_date }}</li>
         <li><i class="fa fa-tags p-2" />Category {{ event.category?.category_name }}</li>
         <li><i class="fa fa-map-marker p-2" />Venue {{ event.venue }}</li>
-        <li
-          v-if="event.is_online"
-          class="text-blue-500 font-semibold"
-        >
-          This event is online
-        </li>
-        <li v-else>
+        <li>
           <i class="fa fa-map-marker p-2" />
           Location {{ event.address?.street_name }}, {{ event.address?.city_name }} {{ event.address?.region_name }}
           <br>
@@ -83,7 +70,6 @@
       >
         <MapPicker :events="[event]" />
       </div>
-      <!--  -->
     </div>
   </div>
 </template>
@@ -100,13 +86,11 @@ definePageMeta({
 })
 const route = useRoute()
 const eventId = route.params.id
-// console.log('hello world')
 
 const { data, loading, error } = await apolloClient.query({ query: GET_EVENT_DETAILS, variables: { id: eventId } })
 const event = ref(null)
 const currentImageIndex = ref(0)
 onMounted(() => {
-  // console.log(data)
   event.value = data.data_events_by_pk
   const updatedImages = [{ image_url: event.value.thumbnail_image_url }, ...(event.value.images || [])]
   event.value = { ...event.value, images: updatedImages }

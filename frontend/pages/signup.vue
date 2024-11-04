@@ -4,7 +4,6 @@
       Signup
     </h2>
     <Form @submit="onSummit">
-      <!-- email input -->
       <div class="mb-4">
         <label
           class="block text-gray-700 dark:text-gray-300 mb-2"
@@ -26,7 +25,6 @@
         />
       </div>
 
-      <!-- password input -->
       <div class="mb-4">
         <label
           for="password"
@@ -48,7 +46,6 @@
         />
       </div>
 
-      <!-- confirm password input -->
       <div class="mb-4">
         <label
           for="confirm_password"
@@ -73,7 +70,7 @@
         :disabled="loading"
         class="flex items-center justify-center w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
       >
-        <i class="fa fa-user-plus mr-2" /> <!-- Add the signup icon -->
+        <i class="fa fa-user-plus mr-2" />
         Signup
       </button>
     </Form>
@@ -83,7 +80,6 @@
     >
       {{ error.message }}
     </div>
-    <!-- Switch to Login -->
     <div class="mt-6 text-center">
       <NuxtLink
         to="/login"

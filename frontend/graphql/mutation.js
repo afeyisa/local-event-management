@@ -59,7 +59,6 @@ mutation insertEvent(
   $category_id: uuid,
   $description: String,
   $venue: String,
-  # $is_online: Boolean,
   $thumbnail_image_url: String,
   $images: [data_images_insert_input!]!,  
   $location: data_locations_insert_input!,
@@ -76,15 +75,11 @@ mutation insertEvent(
       category_id: $category_id,
       description: $description,
       venue: $venue,
-      # # is_online: $is_online,
       thumbnail_image_url: $thumbnail_image_url,
 
       images: {data: $images}, 
-      # Insert into locations table
       location: {data: $location},
-      # Insert into address table
       address: {data: $address},
-      # Insert into event_tags table
       event_tags: {data: $tags},
     }
   ) {
@@ -131,7 +126,6 @@ export const UPDATE_EVENT = gql`
     $by_organization_id: uuid!,
     $description: String,
     $event_date: date,
-    # $is_online: Boolean,
     $thumbnail_image_url: String,
     $ticket_price: numeric,
     $title: String,
@@ -139,16 +133,15 @@ export const UPDATE_EVENT = gql`
     $location: data_locations_set_input!
     $venue: String,
     $tags: [data_event_tags_insert_input!]!,
+    $address: data_address_set_input!,
     $images: [data_images_insert_input!]!
   ) {
-    # Update the event details
     update_data_events_by_pk(
       pk_columns: { event_id: $id }
       _set: {
         category_id: $category_id, 
         description: $description, 
         event_date: $event_date, 
-        # # is_online: $is_online, 
         thumbnail_image_url: $thumbnail_image_url, 
         ticket_price: $ticket_price, 
         title: $title, 
@@ -162,17 +155,17 @@ export const UPDATE_EVENT = gql`
     update_data_locations(where: {located_event_id: {_eq: $id}}, _set: $location) {
     affected_rows
   }
-    # Delete existing event tags
+  update_data_address(where: {addressed_event_id: {_eq: $id}}, _set: $address) {
+    affected_rows
+  }
     delete_data_event_tags(where: { tagged_event_id: { _eq: $id } }) {
       affected_rows
     }
 
-    # Insert new event tags
     insert_data_event_tags(objects: $tags) {
       affected_rows
     }
 
-    # Insert new images
     insert_data_images(objects: $images) {
       affected_rows
     }

@@ -21,7 +21,6 @@
 
 <script setup>
 import { ref } from 'vue'
-// import { useQuery } from '@vue/apollo-composable'
 import OrganizationCard from '~/components/dashboard/OrganizationCard.vue'
 import { GET_ORGANIZATIONS, GET_MY_ID } from '~/graphql/queries'
 import { apolloClient } from '~/plugins/apollo'

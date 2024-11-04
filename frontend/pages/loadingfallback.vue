@@ -6,3 +6,10 @@
     </p>
   </div>
 </template>
+
+<script setup>
+definePageMeta({
+  layout: 'auth',
+  // middleware: 'logedinautoaedirector',
+})
+</script>

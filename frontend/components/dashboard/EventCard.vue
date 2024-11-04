@@ -3,21 +3,18 @@
     v-if="event"
     class="event-card min-w-md max-h-lg rounded overflow-hidden shadow-lg bg-white dark:bg-gray-900"
   >
-    <!-- Event Image -->
     <img
       :src="event.thumbnail_image_url ||'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
       alt="Event Image"
       class="w-full h-48 object-cover"
     >
 
-    <!-- Event Details -->
     <div class="px-6 py-4">
-      <div class="font-bold text-xl mb-2 dark:text-gray-300">
+      <div class="font-bold text-xl mb-2 text-gray-700 dark:text-gray-300">
         {{ event.title }}
       </div>
     </div>
 
-    <!-- Event Metadata -->
     <div class="px-6 pt-4 pb-2">
       <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
         <i class=" p-2 fa fa-calendar" />
@@ -29,7 +26,6 @@
       </div>
     </div>
 
-    <!-- Event Actions -->
     <div class="flex flex-wrap  ">
       <div class="px-2 py-2 w-full sm:w-auto ">
         <NuxtLink
@@ -60,7 +56,6 @@
 </template>
 
 <script setup>
-// import { computed } from 'vue'
 import { useMutation } from '@vue/apollo-composable'
 import { DELETE_EVENT } from '~/graphql/mutation'
 
@@ -71,17 +66,14 @@ const prorps = defineProps({
   },
 })
 const event = ref(prorps.event)
-// Function to format the date nicely
 const formatDate = (date) => {
   const options = { year: 'numeric', month: 'short', day: 'numeric' }
   return new Date(date).toLocaleDateString(undefined, options)
 }
 
 const deleteEvent = async () => {
-  // Show a confirmation dialog
   const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
 
-  // Proceed with deletion if the user confirms
   if (confirmed) {
     try {
       const { mutate } = useMutation(DELETE_EVENT)
@@ -89,16 +81,15 @@ const deleteEvent = async () => {
 
       if (data) {
         event.value = null
-        alert('Organization deleted successfully.')
+        alert('event deleted successfully.')
       }
     }
     catch (err) {
       console.log(err)
-      alert('An error occurred while deleting the organization.')
+      alert('An error occurred while deleting the event.')
     }
   }
   else {
-    // Action was canceled
     alert('Deletion canceled.')
   }
 }

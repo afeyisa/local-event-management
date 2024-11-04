@@ -4,7 +4,6 @@
       {{ id?'update organization':' Create  Organization' }}
     </h1>
 
-    <!-- Form -->
     <Form
       class="space-y-4 "
       @submit="handleSubmit"
@@ -104,7 +103,6 @@
       </button>
     </Form>
 
-    <!-- Success message -->
     <div
       v-if="successMessage"
       class="mt-4 text-green-600"
@@ -112,7 +110,6 @@
       {{ successMessage }}
     </div>
 
-    <!-- Error message -->
     <div
       v-if="errorMessage"
       class="mt-4 text-red-600"
@@ -144,7 +141,6 @@ defineRule('required', (value) => {
   return true
 })
 
-// Form data and mutation setup
 const formData = ref({
   organization_name: ref(''),
   profile: ref(null),
@@ -163,14 +159,11 @@ if (id) {
     /** */
   }
 }
-// Success and error messages
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Create or update mutation setup
 const handleSubmit = async () => {
   try {
-    // upload profile image
     let profile_photo_url
     if (formData.value.profile) {
       const formdata = new FormData()
@@ -199,7 +192,6 @@ const handleSubmit = async () => {
       router.push(`/events/organizations/${data.update_data_organizations_by_pk.organization_id}`)
     }
     else {
-    // create organization
       const { mutate: createOrganization } = useMutation(CREATE_ORGANIZATION)
       const { data } = await createOrganization({
         organization_name: formData.value.organization_name,

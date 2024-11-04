@@ -10,7 +10,6 @@
       <h2 class="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
         About Event
       </h2>
-      <!-- Organization ID -->
       <label
         for="by_organization_id"
         class="block text-gray-700 dark:text-gray-300"
@@ -36,7 +35,6 @@
         class="text-red-500 mb-4"
         name="by_organization_id"
       />
-      <!-- Title -->
       <label
         for="title"
         class="block text-gray-700 dark:text-gray-300"
@@ -53,7 +51,6 @@
         class="text-red-500 mb-4"
         name="title"
       />
-      <!-- Event Date -->
       <label
         for="event_date"
         class="block text-gray-700 dark:text-gray-300"
@@ -70,7 +67,6 @@
         name="event_date"
       />
 
-      <!-- Category ID -->
       <label
         for="category_id"
         class="block text-gray-700 dark:text-gray-300"
@@ -94,35 +90,10 @@
         class="text-red-500 mb-4"
         name="category_id"
       />
-      <!-- Venue -->
-      <!-- Event Type (Online or In-Person) -->
-      <!-- <label
-        for="is_online"
-        class="block text-gray-700 dark:text-gray-300"
-      >Event Type</label>
-      <Field
-        v-model="formData.isOnline"
-        name="is_online"
-        as="select"
-        class="mt-1 block w-full border border-gray-300 dark:border-gray-600 p-2 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline focus:outline-1 focus:outline-blue-500 focus:outline-none"
-        @change="setIsOnline"
-      >
-        <option :value="true">
-          Online
-        </option>
-        <option :value="false">
-          In-Person
-        </option>
-      </Field>
-      <ErrorMessage
-        class="text-red-500 mb-4"
-        name="is_online"
-      /> -->
 
       <h2 class="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
         About Event Tickets
       </h2>
-      <!-- Ticket Price -->
       <label
         for="ticket_price"
         class="block text-gray-700 dark:text-gray-300"
@@ -140,7 +111,6 @@
         name="ticket_price"
       />
 
-      <!-- Total Available Tickets -->
       <label
         for="total_available_tickets"
         class="block text-gray-700 dark:text-gray-300"
@@ -158,11 +128,9 @@
         name="total_available_tickets"
       />
       <div v-if="isInPerson">
-        <!-- Region  -->
         <h2 class="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
           About Event Event Location
         </h2>
-        <!-- map -->
         <div
           id="map"
           :lat-lng="markerPosition"
@@ -184,7 +152,6 @@
           class="text-red-500 mb-4"
           name="region"
         />
-        <!-- city name -->
         <label
           for="city"
           class="block text-gray-700 dark:text-gray-300"
@@ -200,7 +167,6 @@
           class="text-red-500 mb-4"
           name="city"
         />
-        <!-- street name -->
         <label
           for="street"
           class="block text-gray-700 dark:text-gray-300"
@@ -232,7 +198,6 @@
           name="venue"
         />
       </div>
-      <!-- Tags -->
       <div
         class="mt-2"
       >
@@ -269,7 +234,6 @@
               :key="t"
               class="inline-block p-1 bg-gray-200 dark:bg-gray-600 rounded-md"
             >
-              <!-- <span class="inline-block truncate">{{ t.tag_word }}</span> -->
               <button
                 type="button"
                 class="ml-2  text-gray-700 dark:text-gray-300"
@@ -281,7 +245,6 @@
           </ul>
         </div>
       </div>
-      <!-- Description -->
       <label
         for="description"
         class="block text-gray-700 dark:text-gray-300"
@@ -301,7 +264,6 @@
         v-if="id && hasSelectedImages"
         class="relative"
       >
-        <!-- Left Arrow -->
         <button
           v-if="Array.isArray(pevSelectedImages)&&currentImageIndex > 0 && pevSelectedImages.length > 0"
           class="absolute left-0 top-1/2 transform -translate-y-1/2"
@@ -310,14 +272,12 @@
           <i :class="(currentImageIndex > 0 && Array.isArray(pevSelectedImages) && pevSelectedImages.length > 0)?'fa fa-chevron-left dark:text-gray-500 text-gray-800 p-2 text-xl':''" />
         </button>
 
-        <!-- Main Image Display -->
         <img
           :src="pevSelectedImages[currentImageIndex].image_url"
           alt="Event Image"
           class="w-full h-64 object-cover rounded-md mb-6"
         >
 
-        <!-- Right Arrow -->
         <button
           v-if="currentImageIndex < pevSelectedImages.length - 1 && Array.isArray(pevSelectedImages) && pevSelectedImages.length > 0"
           class="absolute right-0 top-1/2 transform -translate-y-1/2"
@@ -334,7 +294,6 @@
           Remove
         </button>
       </div>
-      <!-- Thumbnail Image URL -->
       <div class="flex items-center justify-center w-full">
         <label
           for="thumbnail-file"
@@ -373,8 +332,6 @@
         class="text-red-500 mb-4"
         name="thumnail"
       />
-
-      <!-- for map additional images -->
 
       <div class="flex items-center justify-center w-full">
         <label
@@ -441,7 +398,6 @@
         </ul>
       </div>
 
-      <!-- Submit Button -->
       <button
         type="submit"
         class="w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
@@ -671,13 +627,19 @@ const handleSubmit = async () => {
       category_id: formData.value.categoryId,
       description: formData.value.description,
       event_date: formData.value.eventDate,
-      // is_online: formData.value.isOnline,
       thumbnail_image_url: thumbnail_url,
       ticket_price: formData.value.ticketPrice,
       title: formData.value.title,
       total_available_tickets: formData.value.totalAvailableTickets,
       venue: formData.value.venue,
       tagged_event_id: id,
+
+      address: {
+        street_name: formData.value.street,
+        city_name: formData.value.city,
+        region_name: formData.value.region,
+      },
+
       by_organization_id: formData.value.byOrganizationId,
       location: {
         longitude: longitude.value,
@@ -717,7 +679,6 @@ const handleSubmit = async () => {
           category_id: formData.value.categoryId,
           description: formData.value.description,
           venue: formData.value.venue,
-          // is_online: formData.value.isOnline,
           thumbnail_image_url: thumbnail_url,
           images: imageObjects,
           location: {
@@ -745,7 +706,6 @@ const handleSubmit = async () => {
 }
 
 defineRule('required', (value) => {
-  // return true
   if (!value || !value.length) {
     return 'This field is required'
   }
@@ -772,14 +732,13 @@ defineRule('greaterthanzero', (value) => {
 const hasSelectedImages = computed(() => pevSelectedImages.value && pevSelectedImages.value.length > 0)
 
 async function start() {
-  const L = await import('leaflet') // Ensure Leaflet loads only on the client side
+  const L = await import('leaflet')
 
-  map.value = L.map('map').setView([9.0192, 38.7525], 13) // Initial coordinates and zoom
+  map.value = L.map('map').setView([9.0192, 38.7525], 13)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   }).addTo(map.value)
 
-  // map.value.setView([latitude.value, longitude.value], 13)
   markerPosition.value = L.marker([9.0192, 38.7525])
     .addTo(map.value)
   map.value.on('click', updateCoordinates)

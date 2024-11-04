@@ -2,7 +2,6 @@ import { useRouter } from 'vue-router'
 import { CHECK_AUTH_QUERY } from '~/graphql/queries'
 import { apolloClient } from '~/plugins/apollo'
 
-// let isCheckingAuth = true
 export default defineNuxtRouteMiddleware(async (req) => {
   const router = useRouter()
   try {

@@ -1,10 +1,6 @@
 <template>
   <div>
-    <div v-if="loading">
-      <LoadingFallback />
-    </div>
     <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Loop through the events array and pass each event as a prop to EventCard -->
       <EventCard
         v-for="event in events"
         :key="event.event_id"
@@ -28,7 +24,7 @@ if (!loading && !error) {
 }
 
 definePageMeta({
-  layout: 'mydashboard',
   middleware: 'auth',
+  layout: 'mydashboard',
 })
 </script>

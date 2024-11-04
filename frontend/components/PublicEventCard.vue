@@ -2,16 +2,14 @@
   <div
     class="e-card min-w-72 max-h-fit rounded overflow-hidden shadow-lg bg-white dark:bg-gray-900"
   >
-    <!-- Event Image -->
     <div class="grid  sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 mb-2">
       <img
         :src="e.thumbnail_image_url || 'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
         alt="Event Image"
         class="w-full h-52 rounded-sm  object-cover"
       >
-      <!-- Event Metadata -->
       <div class="px-6 pt-4  pb-2 h-52">
-        <div class="text-2xl font-bold text-gray-600 dark:text-gray-300">
+        <div class="text-2xl font-bold text-gray-600 dark:text-gray-300 ">
           {{ e.title }}
         </div>
         <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -39,13 +37,7 @@
         </div>
       </div>
     </div>
-    <!-- Event Details -->
-    <div class="px-6 py-1">
-      <!-- <p class="text-gray-700 text-base dark:text-gray-300">
-        {{ e.description && e.description.length < 255 ? e.description : e.description ? e.description.slice(0, 255) + '...' : '' }}
-      </p> -->
-    </div>
-
+    <div class="px-6 py-1" />
     <div class=" items-baseline text-gray-600 dark:text-gray-400 ">
       <div
         v-if="e.organization&&e.organization.organization_name"
@@ -70,7 +62,6 @@
       </p>
     </div>
 
-    <!-- Event Actions -->
     <div class="px-6 py-1 flex space-x-4">
       <div class="px-6 py-4">
         <button
@@ -133,7 +124,6 @@ const formatDate = (date) => {
 }
 
 const bookOrUnmarkEvent = async () => {
-  // un booking the event
   if (bookmarks.value.length > 0 && myId.value) {
     try {
       const { mutate } = useMutation(UN_BOOK_MARK_EVENT)
@@ -144,7 +134,6 @@ const bookOrUnmarkEvent = async () => {
     /** */
     }
   }
-  // book marking the event
   else if (myId.value) {
     try {
       const { mutate } = useMutation(BOOK_MARK_EVENT)

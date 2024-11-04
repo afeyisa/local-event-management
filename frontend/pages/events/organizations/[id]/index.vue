@@ -67,20 +67,21 @@
 import { apolloClient } from '~/plugins/apollo'
 import { GET_MY_ID, GET_ORGANIZATIONS, PUBLIC_GET_ORGANIZATIONS, CHECK_AUTH_QUERY, ORG_TOTAL_EVENTS } from '~/graphql/queries'
 
-// Props to receive organization data
 const route = useRoute()
 const Id = route.params.id
+
 definePageMeta({
   layout: 'mydashboard',
   middleware: 'auth',
 })
+
 const follows = ref([])
 const myId = ref(null)
 const totalEventCreated = ref(0)
 const organization = ref(null)
 const isLoggedIn = ref(false)
 
-const { data: ch } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
+const { data: ch, loading, error } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
 if (ch && ch.isAuthenticated) {
   isLoggedIn.value = true
 }

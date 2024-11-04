@@ -13,10 +13,8 @@ import { LOGOUT_MUTATION } from '~/graphql/mutation'
 
 const logout = async () => {
   try {
-    // const router = useRouter()
     const { mutate } = useMutation(LOGOUT_MUTATION)
     await mutate()
-    // router.push('/')
     window.location.href = window.location.origin
   }
   catch { /* empty */ }

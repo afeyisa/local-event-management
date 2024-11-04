@@ -16,7 +16,7 @@ func LogOutHandler(w http.ResponseWriter, r *http.Request) {
         HttpOnly: true, 
         Secure:   true, 
         SameSite: http.SameSiteDefaultMode,
-        MaxAge:   -86400, // Cookie expiration (1 day)
+        MaxAge:   -86400,
     }
     http.SetCookie(w, &cookie)
 	res := LogOutResponse{Success: true}
