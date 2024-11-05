@@ -1,0 +1,38 @@
+export const CREATE_EVENT = gql`
+mutation insertEvent(
+  $by_organization_id: uuid!,
+  $title: String!,
+  $ticket_price: numeric,
+  $total_available_tickets: Int,
+  $event_date: date,
+  $category_id: uuid,
+  $description: String,
+  $venue: String,
+  $thumbnail_image_url: String,
+  $images: [data_images_insert_input!]!,  
+  $location: data_locations_insert_input!,
+  $address: data_address_insert_input!,
+  $tags: [data_event_tags_insert_input!]! 
+) {
+  insert_data_events_one(
+    object: {
+      by_organization_id: $by_organization_id,
+      title: $title,
+      ticket_price: $ticket_price,
+      total_available_tickets: $total_available_tickets,
+      event_date: $event_date,
+      category_id: $category_id,
+      description: $description,
+      venue: $venue,
+      thumbnail_image_url: $thumbnail_image_url,
+
+      images: {data: $images}, 
+      location: {data: $location},
+      address: {data: $address},
+      event_tags: {data: $tags},
+    }
+  ) {
+    event_id
+    title
+  }
+}`

@@ -1,0 +1,41 @@
+import { gql } from 'graphql-tag'
+
+export const GET_EVENT_DETAILS = gql`
+  query GetEventDetails($id: uuid!) {
+    data_events_by_pk(event_id: $id) {
+      event_id
+      title
+      ticket_price
+      total_available_tickets
+      event_date
+      by_organization_id
+      category_id
+      category {
+        category_name
+      }
+      description
+      venue
+      thumbnail_image_url
+      images {
+        image_url
+      }
+      address {
+        street_name
+        city_name
+        region_name
+      }
+
+      event_tags {
+      tag_word_id
+      }
+      bookmarks {
+        book_marked_event_id
+        book_marker_user_id
+      }
+      location{
+        latitude
+        longitude
+      }
+    }
+  }
+`

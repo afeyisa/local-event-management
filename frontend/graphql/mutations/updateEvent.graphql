@@ -1,0 +1,52 @@
+export const UPDATE_EVENT = gql`
+  mutation updateEvent(
+    $id: uuid!,
+    $category_id: uuid,
+    $by_organization_id: uuid!,
+    $description: String,
+    $event_date: date,
+    $thumbnail_image_url: String,
+    $ticket_price: numeric,
+    $title: String,
+    $total_available_tickets: Int,
+    $location: data_locations_set_input!
+    $venue: String,
+    $tags: [data_event_tags_insert_input!]!,
+    $address: data_address_set_input!,
+    $images: [data_images_insert_input!]!
+  ) {
+    update_data_events_by_pk(
+      pk_columns: { event_id: $id }
+      _set: {
+        category_id: $category_id, 
+        description: $description, 
+        event_date: $event_date, 
+        thumbnail_image_url: $thumbnail_image_url, 
+        ticket_price: $ticket_price, 
+        title: $title, 
+        total_available_tickets: $total_available_tickets, 
+        venue: $venue,
+        by_organization_id: $by_organization_id,
+      }
+    ) {
+      event_id
+    }
+    update_data_locations(where: {located_event_id: {_eq: $id}}, _set: $location) {
+    affected_rows
+  }
+  update_data_address(where: {addressed_event_id: {_eq: $id}}, _set: $address) {
+    affected_rows
+  }
+    delete_data_event_tags(where: { tagged_event_id: { _eq: $id } }) {
+      affected_rows
+    }
+
+    insert_data_event_tags(objects: $tags) {
+      affected_rows
+    }
+
+    insert_data_images(objects: $images) {
+      affected_rows
+    }
+  }
+`

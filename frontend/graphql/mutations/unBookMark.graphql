@@ -1,0 +1,10 @@
+export const UN_BOOK_MARK_EVENT = gql`
+  mutation unBookMarkEvent(
+    $book_marker_user_id: uuid!
+    $book_marked_event_id: uuid!
+  ) { 
+    delete_data_bookmarks(where: { _and: {book_marked_event_id: {_eq: $book_marked_event_id}, book_marker_user_id: {_eq: $book_marker_user_id}}}) {
+    affected_rows
+  }
+  }
+`

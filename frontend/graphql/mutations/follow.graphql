@@ -1,0 +1,13 @@
+export const FOLLOW_EVENT = gql`
+  mutation followEvent(
+    $followed_organization_id: uuid!
+    $following_user_id: uuid!
+  ) {
+    insert_data_follows(objects: {followed_organization_id: $followed_organization_id, following_user_id: $following_user_id}) {
+    returning {
+      followed_organization_id
+      following_user_id
+    }
+    }
+  }
+`

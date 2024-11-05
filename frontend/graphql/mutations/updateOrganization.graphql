@@ -1,0 +1,21 @@
+export const UPDATE_ORGANIZATION = gql`
+  mutation UpdateOrganization(
+    $organization_name: String!,
+    $profile_photo_url: String,
+    $bio: String,
+    $description: String
+    $organization_id:uuid!
+  ) {
+    update_data_organizations_by_pk(
+      pk_columns: { organization_id: $organization_id },
+      _set: {
+        organization_name: $organization_name,
+        profile_photo_url: $profile_photo_url,
+        bio: $bio,
+        description: $description
+      }
+    ) {
+      organization_id
+    }
+  }
+`

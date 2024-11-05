@@ -1,0 +1,13 @@
+export const BOOK_MARK_EVENT = gql`
+  mutation bookMarkEvent(
+    $book_marked_event_id: uuid!
+    $book_marker_user_id: uuid!
+  ) {
+    insert_data_bookmarks(objects: {book_marked_event_id: $book_marked_event_id, book_marker_user_id: $book_marker_user_id}) {
+      returning {
+          book_marked_event_id
+          book_marker_user_id
+        }
+    }
+  }
+`

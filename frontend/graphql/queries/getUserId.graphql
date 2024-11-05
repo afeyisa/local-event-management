@@ -1,0 +1,8 @@
+import { gql } from 'graphql-tag'
+
+export const GET_MY_ID = gql`
+  query{data_users {
+    user_id
+  }
+  }
+`

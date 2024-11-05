@@ -1,0 +1,10 @@
+export const UN_FOLLOW_EVENT = gql`
+  mutation unfolloweEVENT(
+    $followed_organization_id: uuid!
+    $following_user_id: uuid!
+  ) { 
+    delete_data_follows(where: { _and: {followed_organization_id: {_eq: $followed_organization_id}, following_user_id: {_eq: $following_user_id}}}) {
+    affected_rows
+  }
+  }
+`

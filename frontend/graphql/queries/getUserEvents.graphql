@@ -1,0 +1,14 @@
+import { gql } from 'graphql-tag'
+
+export const GET_MY_EVENTS = gql`
+  query myEvents($where: data_events_bool_exp!){
+    data_events(where: $where, order_by: {created_at: desc}) {
+      event_id
+      title
+      description
+      event_date
+      venue
+      thumbnail_image_url
+  }
+}
+`

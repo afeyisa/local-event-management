@@ -1,0 +1,19 @@
+import { gql } from 'graphql-tag'
+
+export const GET_ORGANIZATIONS = gql`
+  query orgs($where:data_organizations_bool_exp!){
+    data_organizations(where:$where) {
+      organization_name
+      bio
+      created_at
+      description
+      organization_id
+      profile_photo_url
+      followers
+      follows {
+        following_user_id
+        followed_organization_id
+      }
+    }
+  }
+`

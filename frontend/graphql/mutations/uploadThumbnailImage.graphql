@@ -1,0 +1,7 @@
+export const UPLOAD_THUMBNAIL_IMAGE = gql`
+    mutation uploadImage($image: String!) {
+      uploadImage(image: $image) {
+        url
+      }
+    }
+  `

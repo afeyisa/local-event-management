@@ -1,0 +1,10 @@
+import { gql } from 'graphql-tag'
+
+export const GET_CATAGORIES = gql`
+  query{
+    data_categories {
+      category_id
+      category_name
+  }
+}
+`

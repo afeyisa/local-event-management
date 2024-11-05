@@ -1,0 +1,8 @@
+export const CHECKOUT_TICKET = gql`
+mutation checkoutTicket ($event_id:String!,$user_id:String!){
+  ticketcheckout(event_id: $event_id, user_id: $user_id) {
+    url
+  }
+}
+
+`

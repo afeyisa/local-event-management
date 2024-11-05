@@ -1,0 +1,11 @@
+import { gql } from 'graphql-tag'
+
+export const ORG_TOTAL_EVENTS = gql`
+query GetEventCountByOrganization($organizationId: uuid!) {
+  data_events_aggregate(where: { by_organization_id: { _eq: $organizationId } }) {
+    aggregate {
+      count
+    }
+  }
+}
+`

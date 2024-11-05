@@ -1,0 +1,25 @@
+export const CREATE_ORGANIZATION = gql`
+  mutation CreateOrganization(
+    $organization_name: String!, 
+    $profile_photo_url: String, 
+    $bio: String, 
+    $description: String,
+  ) {
+    insert_data_organizations_one(
+      object: {
+        organization_name: $organization_name, 
+        profile_photo_url: $profile_photo_url, 
+        bio: $bio, 
+        description: $description, 
+      }
+    ) {
+      organization_id
+    }
+  }
+`export const DELETE_ORG = gql`
+mutation deleteOrg($organization_id:uuid!) {
+  delete_data_organizations(where: {organization_id: {_eq: $organization_id}}) {
+    affected_rows
+  }
+}
+`

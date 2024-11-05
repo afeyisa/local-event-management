@@ -234,7 +234,6 @@ export const PUBLIC_BROWSEEVENTS = gql`
 
     }
   }
-
 `
 export const ORG_TOTAL_EVENTS = gql`
 query GetEventCountByOrganization($organizationId: uuid!) {
