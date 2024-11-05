@@ -1,3 +1,12 @@
+<script setup>
+definePageMeta({
+  layout: 'mydashboard',
+  middleware: 'auth',
+})
+const route = useRoute()
+const Id = route.params.id
+</script>
+
 <template>
   <div>
     <GoBack />
@@ -10,12 +19,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-definePageMeta({
-  layout: 'mydashboard',
-  middleware: 'auth',
-})
-const route = useRoute()
-const Id = route.params.id
-</script>

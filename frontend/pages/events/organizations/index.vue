@@ -1,24 +1,3 @@
-<template>
-  <div>
-    <p v-if="error">
-      Something went wrong...
-    </p>
-    <p v-if="loading">
-      Loading...
-    </p>
-    <div v-else>
-      <GoBack />
-      <div class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
-        <OrganizationCard
-          v-for="organization in organizations"
-          :key="organization.organization_name"
-          :organization="organization"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import OrganizationCard from '~/components/dashboard/OrganizationCard.vue'
@@ -41,3 +20,24 @@ if (!loading && !error) {
   }
 }
 </script>
+
+<template>
+  <div>
+    <p v-if="error">
+      Something went wrong...
+    </p>
+    <p v-if="loading">
+      Loading...
+    </p>
+    <div v-else>
+      <GoBack />
+      <div class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
+        <OrganizationCard
+          v-for="organization in organizations"
+          :key="organization.organization_name"
+          :organization="organization"
+        />
+      </div>
+    </div>
+  </div>
+</template>

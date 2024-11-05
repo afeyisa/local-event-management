@@ -1,32 +1,3 @@
-<template>
-  <div>
-    <template v-if="!isOrgDetail && !isEventDetail">
-      <GoBack />
-      <h2 class="text-2xl font-bold mb-4 text-gray-700 dark:text-white">
-        Book Marked Events
-      </h2>
-      <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
-        <PublicEventCard
-          v-for="event in events"
-          :key="event.id"
-          :event="event"
-          @eventid="handleEventId"
-          @orgid="handleOrgid"
-        />
-      </div>
-    </template>
-    <div
-      v-else-if="isEventDetail"
-      class=" w-full   bg-gray-100 p-4 dark:bg-gray-700   overflow-y-auto flex-shrink-0 text-xl min-h-screen"
-    >
-      <EventDetail
-        :id="eventid"
-        @goback="setIsevent"
-      />
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import { BROWSEEVENTS, GET_MY_ID } from '~/graphql/queries'
@@ -68,3 +39,32 @@ const setIsevent = () => {
   isEventDetail.value = false
 }
 </script>
+
+<template>
+  <div>
+    <template v-if="!isOrgDetail && !isEventDetail">
+      <GoBack />
+      <h2 class="text-2xl font-bold mb-4 text-gray-700 dark:text-white">
+        Book Marked Events
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+        <PublicEventCard
+          v-for="event in events"
+          :key="event.id"
+          :event="event"
+          @eventid="handleEventId"
+          @orgid="handleOrgid"
+        />
+      </div>
+    </template>
+    <div
+      v-else-if="isEventDetail"
+      class=" w-full   bg-gray-100 p-4 dark:bg-gray-700   overflow-y-auto flex-shrink-0 text-xl min-h-screen"
+    >
+      <EventDetail
+        :id="eventid"
+        @goback="setIsevent"
+      />
+    </div>
+  </div>
+</template>

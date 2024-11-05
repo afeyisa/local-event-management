@@ -1,3 +1,52 @@
+<script setup>
+import { apolloClient } from '~/plugins/apollo'
+import { GET_MY_ID, GET_ORGANIZATIONS, PUBLIC_GET_ORGANIZATIONS, CHECK_AUTH_QUERY, ORG_TOTAL_EVENTS } from '~/graphql/queries'
+
+const route = useRoute()
+const Id = route.params.id
+
+definePageMeta({
+  layout: 'mydashboard',
+  middleware: 'auth',
+})
+
+const follows = ref([])
+const myId = ref(null)
+const totalEventCreated = ref(0)
+const organization = ref(null)
+const isLoggedIn = ref(false)
+
+const { data: ch, loading, error } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
+if (ch && ch.isAuthenticated) {
+  isLoggedIn.value = true
+}
+
+if (isLoggedIn.value && Id) {
+  const { data: orgData } = await apolloClient.query({ query: GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: Id } } } })
+  const { data_organizations } = orgData
+  organization.value = data_organizations[0]
+  follows.value = organization.value.follows
+  const { data: userData } = await apolloClient.query({ query: GET_MY_ID })
+
+  myId.value = userData.data_users[0].user_id
+
+  const { data: totEvents } = await apolloClient.query({ query: ORG_TOTAL_EVENTS, variables: { organizationId: organization.value.organization_id } })
+  totalEventCreated.value = totEvents.data_events_aggregate.aggregate.count
+}
+else {
+  const { data: orgData } = await apolloClient.query({ query: PUBLIC_GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: props.id } } } })
+  const { data_organizations } = orgData
+  organization.value = data_organizations[0]
+  const { data: totEvents } = await apolloClient.query({ query: ORG_TOTAL_EVENTS, variables: { organizationId: organization.value.organization_id } })
+  totalEventCreated.value = totEvents.data_events_aggregate.aggregate.count
+}
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' }
+  return new Date(date).toLocaleDateString(undefined, options)
+}
+</script>
+
 <template>
   <div class="min-w-md max-h-lg rounded overflow-hidden  text-gray-700 text-base dark:text-gray-300  dark:bg-gray-900">
     <GoBack />
@@ -62,52 +111,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { apolloClient } from '~/plugins/apollo'
-import { GET_MY_ID, GET_ORGANIZATIONS, PUBLIC_GET_ORGANIZATIONS, CHECK_AUTH_QUERY, ORG_TOTAL_EVENTS } from '~/graphql/queries'
-
-const route = useRoute()
-const Id = route.params.id
-
-definePageMeta({
-  layout: 'mydashboard',
-  middleware: 'auth',
-})
-
-const follows = ref([])
-const myId = ref(null)
-const totalEventCreated = ref(0)
-const organization = ref(null)
-const isLoggedIn = ref(false)
-
-const { data: ch, loading, error } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
-if (ch && ch.isAuthenticated) {
-  isLoggedIn.value = true
-}
-
-if (isLoggedIn.value && Id) {
-  const { data: orgData } = await apolloClient.query({ query: GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: Id } } } })
-  const { data_organizations } = orgData
-  organization.value = data_organizations[0]
-  follows.value = organization.value.follows
-  const { data: userData } = await apolloClient.query({ query: GET_MY_ID })
-
-  myId.value = userData.data_users[0].user_id
-
-  const { data: totEvents } = await apolloClient.query({ query: ORG_TOTAL_EVENTS, variables: { organizationId: organization.value.organization_id } })
-  totalEventCreated.value = totEvents.data_events_aggregate.aggregate.count
-}
-else {
-  const { data: orgData } = await apolloClient.query({ query: PUBLIC_GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: props.id } } } })
-  const { data_organizations } = orgData
-  organization.value = data_organizations[0]
-  const { data: totEvents } = await apolloClient.query({ query: ORG_TOTAL_EVENTS, variables: { organizationId: organization.value.organization_id } })
-  totalEventCreated.value = totEvents.data_events_aggregate.aggregate.count
-}
-
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' }
-  return new Date(date).toLocaleDateString(undefined, options)
-}
-</script>

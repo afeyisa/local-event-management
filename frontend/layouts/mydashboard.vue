@@ -1,3 +1,13 @@
+<script setup>
+import { ref } from 'vue'
+
+const isSidebarOpen = ref(false)
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
+</script>
+
 <template>
   <ClientOnly>
     <div
@@ -61,13 +71,3 @@
     </div>
   </ClientOnly>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-
-const isSidebarOpen = ref(false)
-
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value
-}
-</script>

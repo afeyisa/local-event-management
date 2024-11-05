@@ -1,12 +1,3 @@
-<template>
-  <div>
-    <GoBack />
-    <EventForm
-      :id="eventId"
-    />
-  </div>
-</template>
-
 <script setup>
 import EventForm from '~/components/dashboard/EventForm.vue'
 
@@ -17,3 +8,12 @@ definePageMeta({
 const route = useRoute()
 const eventId = route.params.id
 </script>
+
+<template>
+  <div>
+    <GoBack />
+    <EventForm
+      :id="eventId"
+    />
+  </div>
+</template>

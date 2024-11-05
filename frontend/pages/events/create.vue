@@ -1,3 +1,12 @@
+<script setup>
+import EventForm from '~/components/dashboard/EventForm.vue'
+
+definePageMeta({
+  layout: 'mydashboard',
+  middleware: 'auth',
+})
+</script>
+
 <template>
   <div>
     <GoBack />
@@ -8,12 +17,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import EventForm from '~/components/dashboard/EventForm.vue'
-
-definePageMeta({
-  layout: 'mydashboard',
-  middleware: 'auth',
-})
-</script>

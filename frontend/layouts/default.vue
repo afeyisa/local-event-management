@@ -9,6 +9,3 @@
     </footer>
   </div>
 </template>
-
-<script setup>
-</script>

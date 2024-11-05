@@ -1,3 +1,87 @@
+<script setup>
+import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
+import { useMutation } from '@vue/apollo-composable'
+import { SIGNUP_MUTATION } from '~/graphql/mutation'
+
+const limit = 5
+
+definePageMeta({
+  layout: 'auth',
+})
+//* ***********validation ********************************/
+defineRule('validateEmail', (value) => {
+  // console.log(value)
+  if (!value) {
+    return 'This field is required'
+  }
+
+  const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
+  if (!regex.test(value)) {
+    return 'This field must be a valid email'
+  }
+
+  if (value.length < limit) {
+    return `This must be at least ${limit} character`
+  }
+
+  return true
+})
+
+defineRule('confirmed', (value, [target], ctx) => {
+  if (value === ctx.form[target]) {
+    return true
+  }
+  return 'Passwords must match'
+})
+
+defineRule('passordValidate', (value) => {
+  if (!value || !value.length) {
+    return 'password is required'
+  }
+
+  if (!/[0-9]/.test(value)) {
+    return 'Password must contain number'
+  }
+  if (!/[A-Z]/.test(value)) {
+    return 'Password must contain at least one uppercase letter'
+  }
+
+  if (!/[a-z]/.test(value)) {
+    return 'Password must contain at least one lowercase letter'
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+    return 'Password must contain at least one special character'
+  }
+  if (value.length < 5) {
+    return 'password must contain 5 characters'
+  }
+  if (value.length > 128) {
+    return 'Password cannot exceed 128 characters'
+  }
+
+  return true
+})
+//* *********************************************************************** */
+
+const email = ref('')
+const password = ref('')
+const { mutate, loading, error } = useMutation(SIGNUP_MUTATION)
+const onSummit = async () => {
+  try {
+    await mutate({
+      email: email.value,
+      password: password.value,
+    },
+    )
+    navigateTo('/')
+  }
+  catch {
+    console.log('unable to signup')
+  }
+}
+</script>
+
 <template>
   <div>
     <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
@@ -90,89 +174,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
-import { useMutation } from '@vue/apollo-composable'
-import { SIGNUP_MUTATION } from '~/graphql/mutation'
-
-const limit = 5
-
-definePageMeta({
-  layout: 'auth',
-})
-//* ***********validation ********************************/
-defineRule('validateEmail', (value) => {
-  // console.log(value)
-  if (!value) {
-    return 'This field is required'
-  }
-
-  const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
-  if (!regex.test(value)) {
-    return 'This field must be a valid email'
-  }
-
-  if (value.length < limit) {
-    return `This must be at least ${limit} character`
-  }
-
-  return true
-})
-
-defineRule('confirmed', (value, [target], ctx) => {
-  if (value === ctx.form[target]) {
-    return true
-  }
-  return 'Passwords must match'
-})
-
-defineRule('passordValidate', (value) => {
-  if (!value || !value.length) {
-    return 'password is required'
-  }
-
-  if (!/[0-9]/.test(value)) {
-    return 'Password must contain number'
-  }
-  if (!/[A-Z]/.test(value)) {
-    return 'Password must contain at least one uppercase letter'
-  }
-
-  if (!/[a-z]/.test(value)) {
-    return 'Password must contain at least one lowercase letter'
-  }
-
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
-    return 'Password must contain at least one special character'
-  }
-  if (value.length < 5) {
-    return 'password must contain 5 characters'
-  }
-  if (value.length > 128) {
-    return 'Password cannot exceed 128 characters'
-  }
-
-  return true
-})
-//* *********************************************************************** */
-
-const email = ref('')
-const password = ref('')
-const router = useRouter()
-
-const { mutate, loading, error } = useMutation(SIGNUP_MUTATION)
-const onSummit = async () => {
-  try {
-    await mutate({
-      email: email.value,
-      password: password.value,
-    },
-    )
-    router.push('/')
-  }
-  catch {
-    console.log('unable to signup')
-  }
-}
-</script>

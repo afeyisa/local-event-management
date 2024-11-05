@@ -1,3 +1,50 @@
+<script setup>
+import { useMutation } from '@vue/apollo-composable'
+import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
+import { LOGIN_MUTATION } from '~/graphql/mutation'
+
+definePageMeta({
+  layout: 'auth',
+})
+
+defineRule('validateEmail', (value) => {
+  if (!value || !value.length) {
+    return 'Email is required'
+  }
+  const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
+  if (!regex.test(value)) {
+    return 'Email must be a valid email'
+  }
+  return true
+})
+
+defineRule('required', (value) => {
+  if (!value || !value.length) {
+    return 'password is required'
+  }
+  return true
+})
+
+const email = ref('')
+const password = ref('')
+const { mutate, loading, error } = useMutation(LOGIN_MUTATION)
+const onLogin = async () => {
+  try {
+    await mutate({
+      email: email.value,
+      password: password.value,
+    },
+    )
+    const redirectPath = localStorage.getItem('redirect') || '/events' // get the redirect path from query or default to root
+    localStorage.removeItem('redirect')
+    window.location.href = window.location.origin + redirectPath
+  }
+  catch {
+    console.log('unable to login')
+  }
+}
+</script>
+
 <template>
   <div>
     <h2 class="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">
@@ -73,51 +120,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { useMutation } from '@vue/apollo-composable'
-import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
-import { LOGIN_MUTATION } from '~/graphql/mutation'
-
-definePageMeta({
-  layout: 'auth',
-  // middleware: 'logedinautoaedirector',
-})
-
-defineRule('validateEmail', (value) => {
-  if (!value || !value.length) {
-    return 'Email is required'
-  }
-  const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
-  if (!regex.test(value)) {
-    return 'Email must be a valid email'
-  }
-  return true
-})
-
-defineRule('required', (value) => {
-  if (!value || !value.length) {
-    return 'password is required'
-  }
-  return true
-})
-
-const email = ref('')
-const password = ref('')
-const { mutate, loading, error } = useMutation(LOGIN_MUTATION)
-const onLogin = async () => {
-  try {
-    await mutate({
-      email: email.value,
-      password: password.value,
-    },
-    )
-    const redirectPath = localStorage.getItem('redirect') || '/events' // get the redirect path from query or default to root
-    localStorage.removeItem('redirect')
-    window.location.href = window.location.origin + redirectPath
-  }
-  catch {
-    console.log('unable to login')
-  }
-}
-</script>

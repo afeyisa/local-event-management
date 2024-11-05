@@ -1,3 +1,38 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { GET_EVENT_DETAILS } from '~/graphql/queries'
+import { apolloClient } from '~/plugins/apollo'
+
+definePageMeta({
+  layout: 'mydashboard',
+  middleware: 'auth',
+})
+const route = useRoute()
+const eventId = route.params.id
+
+const { data, loading, error } = await apolloClient.query({ query: GET_EVENT_DETAILS, variables: { id: eventId } })
+const event = ref(null)
+const currentImageIndex = ref(0)
+onMounted(() => {
+  event.value = data.data_events_by_pk
+  const updatedImages = [{ image_url: event.value.thumbnail_image_url }, ...(event.value.images || [])]
+  event.value = { ...event.value, images: updatedImages }
+})
+const previousImage = () => {
+  if (currentImageIndex.value > 0) {
+    currentImageIndex.value--
+  }
+}
+
+// Navigate Next Image
+const nextImage = () => {
+  if (currentImageIndex.value < event.value.images.length - 1) {
+    currentImageIndex.value++
+  }
+}
+</script>
+
 <template>
   <div class="min-w-md max-h-lg rounded overflow-hidden shadow-lg text-gray-700 text-base dark:text-gray-300 bg-white dark:bg-gray-900">
     <div
@@ -73,38 +108,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { GET_EVENT_DETAILS } from '~/graphql/queries'
-import { apolloClient } from '~/plugins/apollo'
-
-definePageMeta({
-  layout: 'mydashboard',
-  middleware: 'auth',
-})
-const route = useRoute()
-const eventId = route.params.id
-
-const { data, loading, error } = await apolloClient.query({ query: GET_EVENT_DETAILS, variables: { id: eventId } })
-const event = ref(null)
-const currentImageIndex = ref(0)
-onMounted(() => {
-  event.value = data.data_events_by_pk
-  const updatedImages = [{ image_url: event.value.thumbnail_image_url }, ...(event.value.images || [])]
-  event.value = { ...event.value, images: updatedImages }
-})
-const previousImage = () => {
-  if (currentImageIndex.value > 0) {
-    currentImageIndex.value--
-  }
-}
-
-// Navigate Next Image
-const nextImage = () => {
-  if (currentImageIndex.value < event.value.images.length - 1) {
-    currentImageIndex.value++
-  }
-}
-</script>
