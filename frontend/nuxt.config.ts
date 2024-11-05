@@ -1,6 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config'
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
   modules: ['@vee-validate/nuxt', '@nuxt/eslint',
@@ -20,9 +19,7 @@ export default defineNuxtConfig({
     },
   },
   veeValidate: {
-    // disable or enable auto imports
     autoImports: true,
-    // Use different names for components
     componentNames: {
       Form: 'VeeForm',
       Field: 'VeeField',
