@@ -6,7 +6,6 @@ import (
 	"local-event-management-backend/auth"
 	"log"
 	"net/http"
-
 	"github.com/joho/godotenv"
 )
 func main() {
