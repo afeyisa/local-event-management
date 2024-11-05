@@ -48,7 +48,7 @@ func MakeJWT(userID uuid.UUID, tokenSecret []byte, expiresIn time.Duration) (str
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(tokenSecret)
 	if err != nil {
-		return "", err // Consider adding context here
+		return "", err 
 	}
 
 	return tokenString, nil

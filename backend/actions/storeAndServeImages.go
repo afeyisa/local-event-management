@@ -30,19 +30,17 @@ func convertToURLs(images []string) []string {
 
 func UploadImage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("image saving called")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // Replace with your frontend URL
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") 
     w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
     w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	// Parse the multipart form, which allows file uploads
-	err := r.ParseMultipartForm(10 << 20) // 10MB file limit
+	err := r.ParseMultipartForm(10 << 20) 
 	if err != nil {
 		fmt.Println(err, "at file")
 		http.Error(w, "Unable to process file", http.StatusBadRequest)
 		return
 	}
 
-	// Check if both `thumbnailimage` and `other_images` are missing
 	_, _,thumbnailErr := r.FormFile("thumbnailimage")
 	otherImages := r.MultipartForm.File["other_images"]
 	if thumbnailErr != nil && len(otherImages) == 0 {
@@ -51,26 +49,22 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var thumbnailURL string
-	// Process the featured image if present
 	if thumbnailErr == nil {
 		file, handler, err := r.FormFile("thumbnailimage")
 		if err == nil {
 			defer file.Close()
 
-			// Validate image type
 			if !isImageFile(handler.Filename) {
 				log.Printf("Unsupported file type for featured image: %s", handler.Filename)
 				http.Error(w, "Unsupported file type for featured image", http.StatusBadRequest)
 				return
 			}
 
-			// Create a unique file name
 			fileExt := filepath.Ext(handler.Filename)
 			fileBase := strings.TrimSuffix(handler.Filename, fileExt)
 			filenameInUUID := uuid.New().String()
 			uniqueFileName := fmt.Sprintf("%s_%s%s", fileBase, filenameInUUID, fileExt)
 
-			// Save the featured image
 			filePath := filepath.Join(uploadPath, uniqueFileName)
 			dst, err := os.Create(filePath)
 			if err != nil {
@@ -87,7 +81,6 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Process other images if present
 	var images []string
 	if len(otherImages) > 0 {
 		if len(otherImages) > 4 {
@@ -105,14 +98,12 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 			}
 			defer file.Close()
 
-			// Validate image type
 			if !isImageFile(fileHeader.Filename) {
 				log.Printf("Unsupported file type for other image %d: %s", i, fileHeader.Filename)
 				http.Error(w, "Unsupported file type for other images", http.StatusBadRequest)
 				return
 			}
 
-			// Create a unique file name for each other image
 			fileExt := filepath.Ext(fileHeader.Filename)
 			fileBase := strings.TrimSuffix(fileHeader.Filename, fileExt)
 			filenameInUUID := uuid.New().String()
@@ -120,7 +111,6 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 			imagePath := filepath.Join(uploadPath, uniqueFileName)
 			images = append(images, imagePath)
 
-			// Save each other image
 			outFile, err := os.Create(imagePath)
 			if err != nil {
 				log.Printf("Error saving other image %d: %v", i, err)
@@ -137,13 +127,11 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Create a response map with the URLs
 	response := map[string]interface{}{
 		"thumbnail_image_url": thumbnailURL,
 		"other_images_urls":   convertToURLs(images),
 	}
 
-	// Send the JSON response
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
@@ -152,20 +140,17 @@ func UploadImage(w http.ResponseWriter, r *http.Request) {
 
 func ServeImage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("image serving called")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // Replace with your frontend URL
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") 
     w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
     w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	// Extract the image file name from the URL path
 	imageName := filepath.Base(r.URL.Path)
 	imagePath := filepath.Join(uploadPath, imageName)
 
-	// Check if the file exists
 	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 		http.Error(w, "File not found", http.StatusNotFound)
 		return
 	}
 
-	// Check if the file is an image
 	if !isImageFile(imageName) {
 		http.Error(w, "Invalid file type", http.StatusBadRequest)
 		return
@@ -179,7 +164,6 @@ func ServeImage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	// Set the appropriate Content-Type header based on the file extension
 	contentType := ""
 	switch strings.ToLower(filepath.Ext(imageName)) {
 	case ".jpg", ".jpeg":
@@ -194,7 +178,6 @@ func ServeImage(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", contentType)
 
-	// Write the image to the response
 	w.WriteHeader(http.StatusOK)
 	_, err = io.Copy(w, file)
 	if err != nil {
