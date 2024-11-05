@@ -1,3 +1,93 @@
+<script setup>
+import { ref } from 'vue'
+import { useMutation } from '@vue/apollo-composable'
+import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
+import { CREATE_ORGANIZATION, UPDATE_ORGANIZATION } from '~/graphql/mutation'
+import { apolloClient } from '~/plugins/apollo'
+import { GET_ORGANIZATIONS } from '~/graphql/queries'
+
+const { id } = defineProps({
+  id: {
+    type: String,
+    required: false,
+  },
+})
+
+defineRule('required', (value) => {
+  if (!value || !value.length) {
+    return 'This field is required'
+  }
+  return true
+})
+
+const formData = ref({
+  organization_name: ref(''),
+  profile: ref(null),
+  bio: ref(''),
+  description: ref(''),
+})
+
+if (id) {
+  try {
+    const { data } = await apolloClient.query({ query: GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: id } } } })
+    formData.value.organization_name = data.data_organizations[0].organization_name
+    formData.value.bio = data.data_organizations[0].bio
+    formData.value.description = data.data_organizations[0].description
+  }
+  catch {
+    /** */
+  }
+}
+const successMessage = ref('')
+const errorMessage = ref('')
+
+const handleSubmit = async () => {
+  try {
+    let profile_photo_url
+    if (formData.value.profile) {
+      const formdata = new FormData()
+      formdata.append('thumbnailimage', formData.value.profile)
+      const response = await fetch('http://localhost:4000/upload', {
+        method: 'POST',
+        body: formdata,
+      })
+      if (response.ok) {
+        const { thumbnail_image_url } = await response.json()
+        profile_photo_url = thumbnail_image_url
+      }
+    }
+
+    if (id) {
+      const { mutate: createOrganization } = useMutation(UPDATE_ORGANIZATION)
+      const { data } = await createOrganization({
+        organization_name: formData.value.organization_name,
+        profile_photo_url: profile_photo_url,
+        bio: formData.value.bio,
+        description: formData.value.description,
+        organization_id: id,
+      })
+      const router = useRouter()
+      console.log(data)
+      router.push(`/events/organizations/${data.update_data_organizations_by_pk.organization_id}`)
+    }
+    else {
+      const { mutate: createOrganization } = useMutation(CREATE_ORGANIZATION)
+      const { data } = await createOrganization({
+        organization_name: formData.value.organization_name,
+        profile_photo_url: profile_photo_url,
+        bio: formData.value.bio,
+        description: formData.value.description,
+      })
+      const router = useRouter()
+      router.push(`/events/organizations/${data.insert_data_organizations_one.organization_id}`)
+    }
+  }
+  catch (error) {
+    errorMessage.value = 'Failed to submit form: ' + error.message
+  }
+}
+</script>
+
 <template>
   <div class="p-8 dark:bg-gray-800 dark:text-gray-300">
     <h1 class="text-3xl font-bold mb-6">
@@ -118,93 +208,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { useMutation } from '@vue/apollo-composable'
-import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
-import { CREATE_ORGANIZATION, UPDATE_ORGANIZATION } from '~/graphql/mutation'
-import { apolloClient } from '~/plugins/apollo'
-import { GET_ORGANIZATIONS } from '~/graphql/queries'
-
-const { id } = defineProps({
-  id: {
-    type: String,
-    required: false,
-  },
-})
-
-defineRule('required', (value) => {
-  if (!value || !value.length) {
-    return 'This field is required'
-  }
-  return true
-})
-
-const formData = ref({
-  organization_name: ref(''),
-  profile: ref(null),
-  bio: ref(''),
-  description: ref(''),
-})
-
-if (id) {
-  try {
-    const { data } = await apolloClient.query({ query: GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: id } } } })
-    formData.value.organization_name = data.data_organizations[0].organization_name
-    formData.value.bio = data.data_organizations[0].bio
-    formData.value.description = data.data_organizations[0].description
-  }
-  catch {
-    /** */
-  }
-}
-const successMessage = ref('')
-const errorMessage = ref('')
-
-const handleSubmit = async () => {
-  try {
-    let profile_photo_url
-    if (formData.value.profile) {
-      const formdata = new FormData()
-      formdata.append('thumbnailimage', formData.value.profile)
-      const response = await fetch('http://localhost:4000/upload', {
-        method: 'POST',
-        body: formdata,
-      })
-      if (response.ok) {
-        const { thumbnail_image_url } = await response.json()
-        profile_photo_url = thumbnail_image_url
-      }
-    }
-
-    if (id) {
-      const { mutate: createOrganization } = useMutation(UPDATE_ORGANIZATION)
-      const { data } = await createOrganization({
-        organization_name: formData.value.organization_name,
-        profile_photo_url: profile_photo_url,
-        bio: formData.value.bio,
-        description: formData.value.description,
-        organization_id: id,
-      })
-      const router = useRouter()
-      console.log(data)
-      router.push(`/events/organizations/${data.update_data_organizations_by_pk.organization_id}`)
-    }
-    else {
-      const { mutate: createOrganization } = useMutation(CREATE_ORGANIZATION)
-      const { data } = await createOrganization({
-        organization_name: formData.value.organization_name,
-        profile_photo_url: profile_photo_url,
-        bio: formData.value.bio,
-        description: formData.value.description,
-      })
-      const router = useRouter()
-      router.push(`/events/organizations/${data.insert_data_organizations_one.organization_id}`)
-    }
-  }
-  catch (error) {
-    errorMessage.value = 'Failed to submit form: ' + error.message
-  }
-}
-</script>

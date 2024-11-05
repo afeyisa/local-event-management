@@ -1,3 +1,43 @@
+<script setup>
+import { useMutation } from '@vue/apollo-composable'
+import { DELETE_EVENT } from '~/graphql/mutation'
+
+const prorps = defineProps({
+  event: {
+    type: Object,
+    required: true,
+  },
+})
+const event = ref(prorps.event)
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' }
+  return new Date(date).toLocaleDateString(undefined, options)
+}
+
+const deleteEvent = async () => {
+  const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
+
+  if (confirmed) {
+    try {
+      const { mutate } = useMutation(DELETE_EVENT)
+      const { data } = await mutate({ event_id: event.value.event_id })
+
+      if (data) {
+        event.value = null
+        alert('event deleted successfully.')
+      }
+    }
+    catch (err) {
+      console.log(err)
+      alert('An error occurred while deleting the event.')
+    }
+  }
+  else {
+    alert('Deletion canceled.')
+  }
+}
+</script>
+
 <template>
   <div
     v-if="event"
@@ -54,46 +94,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { useMutation } from '@vue/apollo-composable'
-import { DELETE_EVENT } from '~/graphql/mutation'
-
-const prorps = defineProps({
-  event: {
-    type: Object,
-    required: true,
-  },
-})
-const event = ref(prorps.event)
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' }
-  return new Date(date).toLocaleDateString(undefined, options)
-}
-
-const deleteEvent = async () => {
-  const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
-
-  if (confirmed) {
-    try {
-      const { mutate } = useMutation(DELETE_EVENT)
-      const { data } = await mutate({ event_id: event.value.event_id })
-
-      if (data) {
-        event.value = null
-        alert('event deleted successfully.')
-      }
-    }
-    catch (err) {
-      console.log(err)
-      alert('An error occurred while deleting the event.')
-    }
-  }
-  else {
-    alert('Deletion canceled.')
-  }
-}
-</script>
 
   <style scoped>
   .event-card {

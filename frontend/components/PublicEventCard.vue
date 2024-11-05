@@ -1,3 +1,86 @@
+<script setup>
+import { useMutation } from '@vue/apollo-composable'
+import { apolloClient } from '~/plugins/apollo'
+import { UN_BOOK_MARK_EVENT, BOOK_MARK_EVENT, CHECKOUT_TICKET } from '~/graphql/mutation'
+import { GET_MY_ID, CHECK_AUTH_QUERY } from '~/graphql/queries'
+
+const emit = defineEmits(['orgid', 'eventid'])
+const props = defineProps({
+  event: {
+    type: Object,
+    required: true,
+  },
+})
+const e = ref(props.event)
+const myId = ref(null)
+const bookmarks = ref([])
+const isLoggedIn = ref(false)
+
+bookmarks.value = e.value.bookmarks ? e.value.bookmarks : []
+const { data } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
+if (data && data.isAuthenticated) {
+  isLoggedIn.value = true
+}
+if (isLoggedIn.value) {
+  const { data: userData, loading, error } = await apolloClient.query({ query: GET_MY_ID })
+  if (!loading && !error) {
+    myId.value = userData.data_users[0].user_id
+  }
+}
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' }
+  return new Date(date).toLocaleDateString(undefined, options)
+}
+
+const bookOrUnmarkEvent = async () => {
+  if (bookmarks.value.length > 0 && myId.value) {
+    try {
+      const { mutate } = useMutation(UN_BOOK_MARK_EVENT)
+      await mutate({ book_marker_user_id: bookmarks.value[0].book_marker_user_id, book_marked_event_id: bookmarks.value[0].book_marked_event_id })
+      bookmarks.value = []
+    }
+    catch {
+    /** */
+    }
+  }
+  else if (myId.value) {
+    try {
+      const { mutate } = useMutation(BOOK_MARK_EVENT)
+      const { data } = await mutate({ book_marked_event_id: e.value.event_id, book_marker_user_id: myId.value })
+      bookmarks.value = data.insert_data_bookmarks.returning
+    }
+    catch {
+      /** */
+    }
+  }
+}
+
+const buyTickets = async (id) => {
+  if (myId.value && id) {
+    try {
+      const { mutate } = useMutation(CHECKOUT_TICKET)
+      const { data } = await mutate({ event_id: id, user_id: myId.value })
+      console.log(data)
+      if (data) {
+        window.location.href = data.ticketcheckout.url
+      }
+    }
+    catch (err) {
+      console.log(err)
+    /** */
+    }
+  }
+}
+
+const emitEventId = (eventid) => {
+  emit('eventid', eventid)
+}
+
+const emitOrgId = (orgid) => {
+  emit('orgid', orgid)
+}
+</script>
+
 <template>
   <div
     class="e-card min-w-72 max-h-fit rounded overflow-hidden shadow-lg bg-white dark:bg-gray-900"
@@ -88,86 +171,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { useMutation } from '@vue/apollo-composable'
-import { apolloClient } from '~/plugins/apollo'
-import { UN_BOOK_MARK_EVENT, BOOK_MARK_EVENT, CHECKOUT_TICKET } from '~/graphql/mutation'
-import { GET_MY_ID, CHECK_AUTH_QUERY } from '~/graphql/queries'
-
-const emit = defineEmits(['orgid', 'eventid'])
-const props = defineProps({
-  event: {
-    type: Object,
-    required: true,
-  },
-})
-const e = ref(props.event)
-const myId = ref(null)
-const bookmarks = ref([])
-const isLoggedIn = ref(false)
-
-bookmarks.value = e.value.bookmarks ? e.value.bookmarks : []
-const { data } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
-if (data && data.isAuthenticated) {
-  isLoggedIn.value = true
-}
-if (isLoggedIn.value) {
-  const { data: userData, loading, error } = await apolloClient.query({ query: GET_MY_ID })
-  if (!loading && !error) {
-    myId.value = userData.data_users[0].user_id
-  }
-}
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' }
-  return new Date(date).toLocaleDateString(undefined, options)
-}
-
-const bookOrUnmarkEvent = async () => {
-  if (bookmarks.value.length > 0 && myId.value) {
-    try {
-      const { mutate } = useMutation(UN_BOOK_MARK_EVENT)
-      await mutate({ book_marker_user_id: bookmarks.value[0].book_marker_user_id, book_marked_event_id: bookmarks.value[0].book_marked_event_id })
-      bookmarks.value = []
-    }
-    catch {
-    /** */
-    }
-  }
-  else if (myId.value) {
-    try {
-      const { mutate } = useMutation(BOOK_MARK_EVENT)
-      const { data } = await mutate({ book_marked_event_id: e.value.event_id, book_marker_user_id: myId.value })
-      bookmarks.value = data.insert_data_bookmarks.returning
-    }
-    catch {
-      /** */
-    }
-  }
-}
-
-const buyTickets = async (id) => {
-  if (myId.value && id) {
-    try {
-      const { mutate } = useMutation(CHECKOUT_TICKET)
-      const { data } = await mutate({ event_id: id, user_id: myId.value })
-      console.log(data)
-      if (data) {
-        window.location.href = data.ticketcheckout.url
-      }
-    }
-    catch (err) {
-      console.log(err)
-    /** */
-    }
-  }
-}
-
-const emitEventId = (eventid) => {
-  emit('eventid', eventid)
-}
-
-const emitOrgId = (orgid) => {
-  emit('orgid', orgid)
-}
-</script>

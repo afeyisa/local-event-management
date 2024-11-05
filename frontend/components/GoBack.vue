@@ -1,3 +1,10 @@
+<script setup>
+const router = useRouter()
+function goBack() {
+  router.go(-1)
+}
+</script>
+
 <template>
   <div>
     <button
@@ -8,10 +15,3 @@
     </button>
   </div>
 </template>
-
-<script setup>
-const router = useRouter()
-function goBack() {
-  router.go(-1)
-}
-</script>

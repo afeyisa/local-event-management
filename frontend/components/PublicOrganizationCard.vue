@@ -1,3 +1,19 @@
+<script setup>
+import { defineProps } from 'vue'
+
+// Props to receive organization data
+defineProps({
+  organization: {
+    type: Object,
+    required: true,
+  },
+})
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' }
+  return new Date(date).toLocaleDateString(undefined, options)
+}
+</script>
+
 <template>
   <div class="w-full bg-gray-100  dark:bg-gray-800 shadow-sm rounded-lg p-1">
     <!-- Organization Profile Photo -->
@@ -26,19 +42,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { defineProps } from 'vue'
-
-// Props to receive organization data
-defineProps({
-  organization: {
-    type: Object,
-    required: true,
-  },
-})
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' }
-  return new Date(date).toLocaleDateString(undefined, options)
-}
-</script>

@@ -1,10 +1,3 @@
-<template>
-  <div
-    id="map"
-    class="map-container w-full h-96 rounded-lg shadow-lg border border-gray-300 z-0 "
-  />
-</template>
-
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 
@@ -65,6 +58,13 @@ onMounted(() => {
   start()
 })
 </script>
+
+<template>
+  <div
+    id="map"
+    class="map-container w-full h-96 rounded-lg shadow-lg border border-gray-300 z-0 "
+  />
+</template>
 
 <style scoped>
 .map-container {

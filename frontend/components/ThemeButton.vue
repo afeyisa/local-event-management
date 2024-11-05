@@ -1,3 +1,23 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const theme = ref('light')
+
+function toggleTheme() {
+  theme.value = theme.value === 'dark' ? 'light' : 'dark'
+  document.documentElement.classList.toggle('dark', theme.value === 'dark')
+  localStorage.setItem('theme', theme.value)
+}
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme) {
+    theme.value = savedTheme
+    document.documentElement.classList.toggle('dark', savedTheme === 'dark')
+  }
+})
+</script>
+
 <template>
   <div
     :class="theme"
@@ -24,23 +44,3 @@
     </button>
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue'
-
-const theme = ref('light')
-
-function toggleTheme() {
-  theme.value = theme.value === 'dark' ? 'light' : 'dark'
-  document.documentElement.classList.toggle('dark', theme.value === 'dark')
-  localStorage.setItem('theme', theme.value)
-}
-
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme')
-  if (savedTheme) {
-    theme.value = savedTheme
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark')
-  }
-})
-</script>
