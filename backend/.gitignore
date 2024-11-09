@@ -22,5 +22,6 @@
 go.work
 go.work.sum
 /uploads
+/docker
 # env file
 .env
