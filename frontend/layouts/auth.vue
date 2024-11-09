@@ -1,3 +1,7 @@
+<script setup>
+import ThemeButton from '~/components/ThemeButton.vue'
+</script>
+
 <template>
   <ClientOnly>
     <div
@@ -28,7 +32,3 @@
     </div>
   </ClientOnly>
 </template>
-
-<script setup>
-import ThemeButton from '~/components/ThemeButton.vue'
-</script>
