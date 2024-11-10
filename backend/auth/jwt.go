@@ -20,7 +20,7 @@ func MakeJWT(userID uuid.UUID, tokenSecret []byte, role string, expiresIn time.D
 		"exp": jwt.NewNumericDate(time.Now().UTC().Add(expiresIn)),
 		"hasura":  map[string]interface{}{
 			"claims": map[string]interface{}{
-			"x-hasura-allowed-roles": []string{"anonymous","user"},
+			"x-hasura-allowed-roles": []string{"anonymous",role},
 			"x-hasura-default-role": role,
 			"x-hasura-user-id":  userID.String() ,
 			},
@@ -40,8 +40,7 @@ func MakeJWT(userID uuid.UUID, tokenSecret []byte, role string, expiresIn time.D
 
 
 func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
-	// Parse the token and validate its claims
-	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
@@ -52,12 +51,10 @@ func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
 		return uuid.Nil, err
 	}
 
-	// Validate the token
-	if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
-		// Extract and return the user ID from the subject
-		userID, err := uuid.Parse(claims.Subject)
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID, err := uuid.Parse(claims["sub"].(string))
 		if err != nil {
-			return uuid.Nil, fmt.Errorf("invalid subject in token: %v", claims.Subject)
+			return uuid.Nil, fmt.Errorf("invalid subject in token")
 		}
 		return userID, nil
 	}
