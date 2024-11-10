@@ -1,16 +1,12 @@
 package main
 
 import (
-	// "encoding/base64"
 	"fmt"
-	// "local-event-management-backend/models/images"
-	// "local-event-management-backend/types"
+	"local-event-management-backend/handlers"
+	"local-event-management-backend/middleware"
 	"log"
 	"net/http"
-	// "os"
-	// "strings"
-
-	"local-event-management-backend/handlers"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -30,12 +26,11 @@ func main() {
   	mux.HandleFunc("/auth",handlers.HasuraAuthHandler)
 	mux.HandleFunc("/logout", handlers.LogOutHandler)
 	mux.HandleFunc("/protectpageroute",handlers.ProtectPageRoute)
-	// mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads/"))))
 	mux.HandleFunc("/upload", handlers.ImageUploads)
 	mux.HandleFunc("/tickectcheckout", handlers.Ticketcheckout)
 	mux.HandleFunc("/serveimage", handlers.ServeImage)
 
 	fmt.Println("server started")
-	err = http.ListenAndServe(":4000", mux)
+	err = http.ListenAndServe(os.Getenv("PORT"), middleware.Auth(mux) )
 	log.Fatal(err)
 }
