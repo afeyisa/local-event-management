@@ -22,7 +22,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// parse the body as action payload
 	var payload types.LoginPayload
 	err = json.Unmarshal(reqBody, &payload)
 	if err != nil {
@@ -84,7 +83,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
     // set cookie
 	http.SetCookie(w, auth.SetCookie(token, 86400))
 
-	// Write the response as JSON
 	res := types.LoginResponse{
 		Success: true,
 	}

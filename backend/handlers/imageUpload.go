@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"local-event-management-backend/models/images"
+	models "local-event-management-backend/models/images"
 	"local-event-management-backend/types"
 	"net/http"
 )
@@ -26,7 +26,7 @@ func ImageUploads(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	result := images.SaveImages(payload.Input)
+	result := models.SaveImages(payload.Input)
 	data, err := json.Marshal(result)
 
 	if err != nil{
