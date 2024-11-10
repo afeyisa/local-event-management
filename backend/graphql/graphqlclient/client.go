@@ -20,7 +20,7 @@ func (d *Doer) Do(req *http.Request) (*http.Response, error) {
 
 
 func NewGraphqlClient()(*graphql.Client, error){
-	hasuraURL := os.Getenv("HASURA")
+	hasuraURL := os.Getenv("HASURA_URL")
 	if hasuraURL == "" {
 		return nil, fmt.Errorf("HASURA environment variable is not found")
 	}
