@@ -1,0 +1,9 @@
+import { gql } from 'graphql-tag'
+
+export const PAYMENT_AMOUNT = gql`
+query getPaymentAmount($tx_ref:uuid!){
+  data_payments(where: {tx_ref: {_eq: $tx_ref}}) {
+    amount
+    currency
+  }
+}`

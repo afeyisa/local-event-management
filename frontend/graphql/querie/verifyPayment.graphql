@@ -1,0 +1,8 @@
+import { gql } from 'graphql-tag'
+
+export const VERIFY_PAYMENT = gql`
+    query verifyPayment($tx_ref: String!) {
+    verifyPayment(tx_ref: $tx_ref) {
+        status
+    }
+}`

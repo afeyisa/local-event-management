@@ -1,6 +1,12 @@
 <script setup>
 import { apolloClient } from '~/plugins/apollo'
-import { GET_MY_ID, GET_ORGANIZATIONS, PUBLIC_GET_ORGANIZATIONS, CHECK_AUTH_QUERY, ORG_TOTAL_EVENTS } from '~/graphql/queries'
+import { ORG_TOTAL_EVENTS } from '~/graphql/querie/getOrgTotalEvents.graphql'
+import { CHECK_AUTH_QUERY } from '~/graphql/querie/checkAuthentication.graphql'
+import { PUBLIC_GET_ORGANIZATIONS } from '~/graphql/querie/getPublicOrgs.graphql'
+import { GET_ORGANIZATIONS } from '~/graphql/querie/getOrganization.graphql'
+import { GET_MY_ID } from '~/graphql/querie/getUserId.graphql'
+import { formatDate } from '#imports'
+import { fetchBase64Image } from '~/composables/fetchImage'
 
 const route = useRoute()
 const Id = route.params.id
@@ -15,6 +21,7 @@ const myId = ref(null)
 const totalEventCreated = ref(0)
 const organization = ref(null)
 const isLoggedIn = ref(false)
+const base64Image = ref(null)
 
 const { data: ch, loading, error } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
 if (ch && ch.isAuthenticated) {
@@ -34,17 +41,19 @@ if (isLoggedIn.value && Id) {
   totalEventCreated.value = totEvents.data_events_aggregate.aggregate.count
 }
 else {
-  const { data: orgData } = await apolloClient.query({ query: PUBLIC_GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: props.id } } } })
+  const { data: orgData } = await apolloClient.query({ query: PUBLIC_GET_ORGANIZATIONS, variables: { where: { organization_id: { _eq: organization.value.id } } } })
   const { data_organizations } = orgData
   organization.value = data_organizations[0]
   const { data: totEvents } = await apolloClient.query({ query: ORG_TOTAL_EVENTS, variables: { organizationId: organization.value.organization_id } })
   totalEventCreated.value = totEvents.data_events_aggregate.aggregate.count
 }
 
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' }
-  return new Date(date).toLocaleDateString(undefined, options)
+const prefetchImages = async () => {
+  base64Image.value = await fetchBase64Image(organization.value.profile_photo_url)
 }
+onMounted(() => {
+  prefetchImages()
+})
 </script>
 
 <template>
@@ -69,7 +78,7 @@ const formatDate = (date) => {
     >
       <img
         v-if="organization.profile_photo_url"
-        :src="organization.profile_photo_url"
+        :src="base64Image"
         alt="Event Image"
         class="w-full h-64 object-cover rounded-md mb-6"
       >

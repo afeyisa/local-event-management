@@ -1,12 +1,12 @@
 <script setup>
 import { useMutation } from '@vue/apollo-composable'
-import { LOGOUT_MUTATION } from '~/graphql/mutation'
+import { LOGOUT_MUTATION } from '~/graphql/mutations/logout.graphql'
 
 const logout = async () => {
   try {
     const { mutate } = useMutation(LOGOUT_MUTATION)
     await mutate()
-    window.location.href = window.location.origin
+    navigateTo('/')
   }
   catch { /* empty */ }
 }

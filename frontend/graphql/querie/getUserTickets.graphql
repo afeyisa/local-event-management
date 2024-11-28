@@ -1,0 +1,19 @@
+import { gql } from 'graphql-tag'
+
+export const GET_USER_TICKETS = gql`
+query GetUserTickets($id:uuid!){
+  data_tickets(where: {ticket_owner_id: {_eq: $id}}, order_by: {purchased_date: desc}) {
+    event_id
+    purchased_date
+    qr_link
+    tx_ref
+    event {
+      event_date
+    }
+    #  payment {
+    #   amount
+    #   currency
+    # }
+  }
+}
+`

@@ -1,13 +1,13 @@
 <template>
   <ul class="space-y-4  pl-10">
     <li class="flex items-center space-x-2 ">
-      <i class="fa fa-home text-blue-500" />
+      <i class="fa fa-search text-blue-500" />
 
       <NuxtLink
         to="/"
         class="text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500"
       >
-        Home
+        Browse Events
       </NuxtLink>
     </li>
 
@@ -39,6 +39,16 @@
         Following
       </NuxtLink>
     </li>
+    <li class="flex items-center space-x-2 ">
+      <i class="fa fa-ticket text-blue-500" />
+      <NuxtLink
+        to="/events/mytickets"
+        class=" text-gray-700 dark:text-white font-semibold hover:text-blue-500 dark:hover:text-blue-500"
+      >
+        Tickets
+      </NuxtLink>
+    </li>
+
     <li class="flex items-center space-x-2 ">
       <i class="fa fa-building text-blue-500" />
       <NuxtLink
@@ -73,6 +83,6 @@
 
       <DashboardLogoutButton />
     </li>
-    <ThemeButton />
+    <ThemeButton class="block sm:hidden" />
   </ul>
 </template>

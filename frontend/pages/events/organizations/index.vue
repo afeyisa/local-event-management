@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import OrganizationCard from '~/components/dashboard/OrganizationCard.vue'
-import { GET_ORGANIZATIONS, GET_MY_ID } from '~/graphql/queries'
+import { GET_ORGANIZATIONS } from '~/graphql/querie/getOrganization.graphql'
+import { GET_MY_ID } from '~/graphql/querie/getUserId.graphql'
+
 import { apolloClient } from '~/plugins/apollo'
 
 definePageMeta({

@@ -1,17 +1,14 @@
 <script setup>
 import { ref } from 'vue'
-// import { useQuery } from '@vue/apollo-composable'
-import { GET_ORGANIZATIONS, GET_MY_ID } from '~/graphql/queries'
+import { GET_ORGANIZATIONS } from '~/graphql/querie/getOrganization.graphql'
+import { GET_MY_ID } from '~/graphql/querie/getUserId.graphql'
 import { apolloClient } from '~/plugins/apollo'
-
-// const emit = defineEmits(['orgid', 'eventid'])
 
 definePageMeta({
   layout: 'mydashboard',
   middleware: 'auth',
 })
 const organizations = ref([])
-const orgId = ref(null)
 const { data: userData, loading, error } = await apolloClient.query({ query: GET_MY_ID })
 if (!loading && !error) {
   const myId = userData.data_users[0].user_id
@@ -20,9 +17,6 @@ if (!loading && !error) {
   if (!loading && !error) {
     organizations.value = data.data_organizations
   }
-}
-const emitOrgId = (o) => {
-  orgId.value = o
 }
 </script>
 
@@ -37,19 +31,19 @@ const emitOrgId = (o) => {
     <div v-else>
       <GoBack />
       <div
-        v-if="!orgId"
         class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"
       >
-        <PublicOrganizationCard
+        <div
           v-for="organization in organizations"
           :key="organization.organization_id"
-          :organization="organization"
-          @click="emitOrgId(organization.organization_id)"
-        />
-      </div>
-      <div v-else>
-        <OrgDetail
-          :id="orgId" />
+        >
+          <NuxtLink
+            class="w-full  dark:text-gray-200 px-1 text-gray-700"
+            :to="`/org/${organization.organization_id}`"
+          >
+            <PublicOrganizationCard :organization="organization" />
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </div>

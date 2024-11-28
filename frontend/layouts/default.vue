@@ -1,6 +1,7 @@
 <template>
   <div>
-    <main class="min-h-screen dark:bg-gray-700 shadow-md">
+    <HeaderComponent />
+    <main class="min-h-screen dark:bg-gray-700">
       <NuxtPage />
     </main>
 

@@ -1,25 +1,30 @@
 <script setup>
 import { defineProps } from 'vue'
+import { formatDate } from '~/composables/formatDate'
+import { fetchBase64Image } from '~/composables/fetchImage'
 
-// Props to receive organization data
-defineProps({
+const { organization } = defineProps({
   organization: {
     type: Object,
     required: true,
   },
 })
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' }
-  return new Date(date).toLocaleDateString(undefined, options)
+
+const base64Image = ref(null)
+const prefetchImages = async () => {
+  base64Image.value = await fetchBase64Image(organization.profile_photo_url)
 }
+
+onMounted(() => {
+  prefetchImages()
+})
 </script>
 
 <template>
   <div class="w-full bg-gray-100  dark:bg-gray-800 shadow-sm rounded-lg p-1">
-    <!-- Organization Profile Photo -->
     <div class="flex items-center dark:text-gray-300 mb-4">
       <img
-        :src="organization.profile_photo_url || 'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
+        :src="base64Image || 'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
         alt="Organization Profile"
         class="w-16 h-16 rounded-full object-cover mr-4"
       >
@@ -33,10 +38,9 @@ const formatDate = (date) => {
         </p>
         <button
           class="text-blue-500 "
-          @click="followEvent(e)"
         >
           <i :class="organization.followers>0?'fa fa-user':'fa fa-user-plus'" />
-          {{organization.followers+' '+'Followers' }}
+          {{ organization.followers+' '+'Followers' }}
         </button>
       </div>
     </div>

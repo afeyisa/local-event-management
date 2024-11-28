@@ -1,6 +1,8 @@
 <script setup>
 import { useMutation } from '@vue/apollo-composable'
-import { DELETE_EVENT } from '~/graphql/mutation'
+import { DELETE_EVENT } from '~/graphql/mutations/deleteEvent.graphql'
+import { formatDate } from '~/composables/formatDate'
+import { fetchBase64Image } from '~/composables/fetchImage'
 
 const prorps = defineProps({
   event: {
@@ -9,11 +11,14 @@ const prorps = defineProps({
   },
 })
 const event = ref(prorps.event)
-const formatDate = (date) => {
-  const options = { year: 'numeric', month: 'short', day: 'numeric' }
-  return new Date(date).toLocaleDateString(undefined, options)
+const base64Image = ref(null)
+const prefetchImages = async () => {
+  base64Image.value = await fetchBase64Image(event.value.thumbnail_image_url)
 }
 
+onMounted(() => {
+  prefetchImages()
+})
 const deleteEvent = async () => {
   const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
 
@@ -27,8 +32,7 @@ const deleteEvent = async () => {
         alert('event deleted successfully.')
       }
     }
-    catch (err) {
-      console.log(err)
+    catch {
       alert('An error occurred while deleting the event.')
     }
   }
@@ -44,7 +48,7 @@ const deleteEvent = async () => {
     class="event-card min-w-md max-h-lg rounded overflow-hidden shadow-lg bg-white dark:bg-gray-900"
   >
     <img
-      :src="event.thumbnail_image_url ||'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
+      :src="base64Image ||'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
       alt="Event Image"
       class="w-full h-48 object-cover"
     >

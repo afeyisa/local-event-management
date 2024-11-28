@@ -1,0 +1,10 @@
+import { gql } from 'graphql-tag'
+
+export const GET_ORGANIZATIONS_MY_ORG = gql`
+  query getMyorgs($where:data_organizations_bool_exp!){
+    data_organizations(where:$where)
+    {
+      organization_id
+      organization_name
+    }
+  }`

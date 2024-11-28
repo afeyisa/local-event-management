@@ -1,0 +1,91 @@
+import { gql } from 'graphql-tag'
+
+export const BROWSEEVENTS = gql`
+ query browseEvents( $where: data_events_bool_exp!
+  $offset: Int 
+  $limit:Int) {
+    data_events(where: $where,offset: $offset, limit: $limit) {
+      event_id
+      title
+      description
+      ticket_price
+      event_date
+      thumbnail_image_url
+      total_available_tickets
+      address {
+        street_name
+        city_name
+        region_name
+      }
+      location{
+        latitude
+        longitude
+      }
+      category{
+      category_name
+      }
+
+    bookmarks {
+      book_marker_user_id
+      book_marked_event_id
+    }
+
+    organization {
+      created_at
+      followers
+      organization_id
+      organization_name
+      follows {
+        following_user_id
+        followed_organization_id
+      }
+    }
+
+    }
+  }
+`
+export const PUBLIC_BROWSEEVENTS = gql`
+ query SearchEventsByTitle(
+  $where: data_events_bool_exp!
+  $offset: Int 
+  $limit:Int) {
+    data_events(where: $where,offset: $offset, limit: $limit) {
+      event_id
+      title
+      description
+      ticket_price
+      event_date
+      thumbnail_image_url
+      total_available_tickets
+      address {
+        street_name
+        city_name
+        region_name
+      }
+      location{
+        latitude
+        longitude
+      }
+      category{
+      category_name
+      }
+    organization {
+      created_at
+      followers
+      organization_id
+      organization_name
+    }
+
+    }
+  }
+`
+export const HAS_MORE_EVENT = gql`
+query ($where: data_events_bool_exp!, $offset:Int){
+data_events_aggregate(where:$where, offset: $offset) {
+  has_more:
+    aggregate {
+      count
+    }
+  }
+  }
+` 

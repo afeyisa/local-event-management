@@ -1,3 +1,51 @@
+<script setup>
+import { defineProps } from 'vue'
+import { useMutation } from '@vue/apollo-composable'
+import { DELETE_ORG } from '~/graphql/mutations/deleteOrganization.graphql'
+import { fetchBase64Image } from '~/composables/fetchImage'
+
+const props = defineProps({
+  organization: {
+    type: Object,
+    required: true,
+  },
+})
+
+const organization = ref(props.organization)
+const base64Image = ref(null)
+const prefetchImages = async () => {
+  base64Image.value = await fetchBase64Image(organization.value.profile_photo_url)
+}
+
+// watch(organization.profile_photo_url, prefetchImages, { immediate: true })
+
+onMounted(() => {
+  prefetchImages()
+})
+const deleteOrg = async () => {
+  const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
+
+  if (confirmed) {
+    try {
+      const { mutate } = useMutation(DELETE_ORG)
+      const { data } = await mutate({ organization_id: organization.value.organization_id })
+
+      if (data) {
+        organization.value = null
+        alert('Organization deleted successfully.')
+      }
+    }
+    catch (err) {
+      console.log(err)
+      alert('An error occurred while deleting the organization.')
+    }
+  }
+  else {
+    alert('Deletion canceled.')
+  }
+}
+</script>
+
 <template>
   <div
     v-if="organization"
@@ -5,7 +53,7 @@
   >
     <div class="flex items-center dark:text-gray-300 mb-4">
       <img
-        :src="organization.profile_photo_url || 'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
+        :src="base64Image || 'https://via.placeholder.com/400x300.png?text=Vue+Conference'"
         alt="Organization Profile"
         class="w-16 h-16 rounded-full object-cover mr-4"
       >
@@ -55,41 +103,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { defineProps } from 'vue'
-import { useMutation } from '@vue/apollo-composable'
-import { DELETE_ORG } from '~/graphql/mutation'
-
-const props = defineProps({
-  organization: {
-    type: Object,
-    required: true,
-  },
-})
-
-const organization = ref(props.organization)
-
-const deleteOrg = async () => {
-  const confirmed = confirm('Are you sure you want to delete this organization? This action cannot be undone.')
-
-  if (confirmed) {
-    try {
-      const { mutate } = useMutation(DELETE_ORG)
-      const { data } = await mutate({ organization_id: organization.value.organization_id })
-
-      if (data) {
-        organization.value = null
-        alert('Organization deleted successfully.')
-      }
-    }
-    catch (err) {
-      console.log(err)
-      alert('An error occurred while deleting the organization.')
-    }
-  }
-  else {
-    alert('Deletion canceled.')
-  }
-}
-</script>

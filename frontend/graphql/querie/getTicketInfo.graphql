@@ -1,0 +1,21 @@
+import { gql } from 'graphql-tag'
+export const GET_TICKET_INFO = gql`
+query getTikcetInfo(
+    $ticket_id: uuid!
+){
+  data_tickets(where: {ticket_id: {_eq: $ticket_id}}) {
+    event_id
+    purchased_date
+    ticket_id
+    ticket_owner_id
+    tx_ref
+    event {
+      thumbnail_image_url
+      venue
+      title
+      event_date
+    }
+  }
+}
+
+`

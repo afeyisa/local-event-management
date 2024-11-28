@@ -1,7 +1,7 @@
 <script setup>
 import { useMutation } from '@vue/apollo-composable'
 import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
-import { LOGIN_MUTATION } from '~/graphql/mutation'
+import { LOGIN_MUTATION } from '~/graphql/mutations/login.graphql'
 
 definePageMeta({
   layout: 'auth',
@@ -37,10 +37,10 @@ const onLogin = async () => {
     )
     const redirectPath = localStorage.getItem('redirect') || '/events' // get the redirect path from query or default to root
     localStorage.removeItem('redirect')
-    window.location.href = window.location.origin + redirectPath
+    navigateTo(redirectPath)
   }
   catch {
-    console.log('unable to login')
+    // console.log('unable to login')
   }
 }
 </script>
@@ -51,7 +51,6 @@ const onLogin = async () => {
       Login
     </h2>
     <Form @submit="onLogin">
-      <!-- email input -->
       <div class="mb-4">
         <label
           class="block text-gray-700 dark:text-gray-300 mb-2"
@@ -73,7 +72,6 @@ const onLogin = async () => {
         />
       </div>
 
-      <!-- password input -->
       <div class="mb-4">
         <label
           for="password"
@@ -91,7 +89,7 @@ const onLogin = async () => {
         />
         <ErrorMessage
           class="text-red-500 mb-4"
-          name="Enter your password"
+          name="password"
         />
       </div>
 
@@ -99,7 +97,7 @@ const onLogin = async () => {
         :disabled="loading"
         class="flex items-center justify-center w-full bg-blue-500 rounded-md text-white py-2 hover:bg-blue-600 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700"
       >
-        <i class="fa fa-sign-in mr-2" /> <!-- Add the login icon -->
+        <i class="fa fa-sign-in mr-2" />
         Login
       </button>
     </Form>
@@ -109,7 +107,6 @@ const onLogin = async () => {
     >
       {{ error.message }}
     </div>
-    <!-- Switch to Login -->
     <div class="mt-6 text-center">
       <NuxtLink
         to="/signup"

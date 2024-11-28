@@ -1,17 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import { apolloClient } from '~/plugins/apollo'
-import { CHECK_AUTH_QUERY } from '~/graphql/queries'
+import { isLoggedIn } from '~/composables/user'
 
-const isLoggedIn = ref(false)
-const { data } = await apolloClient.query({ query: CHECK_AUTH_QUERY })
-if (data && data.isAuthenticated) {
-  isLoggedIn.value = true
-}
+const checkLoggedin = ref(false)
+checkLoggedin.value = await isLoggedIn()
 </script>
 
 <template>
-  <ul class="flex items-center space-x-4">
+  <ul class="flex items-end sm:items-center text-sm sm:text-lg  space-x-4">
     <li>
       <NuxtLink
         to="/events"
@@ -21,7 +17,7 @@ if (data && data.isAuthenticated) {
         My Events
       </NuxtLink>
     </li>
-    <li v-show="!isLoggedIn">
+    <li v-show="!checkLoggedin">
       <NuxtLink
         to="/login"
         class="hover:underline"
@@ -30,7 +26,7 @@ if (data && data.isAuthenticated) {
         Login
       </NuxtLink>
     </li>
-    <li v-show="!isLoggedIn">
+    <li v-show="!checkLoggedin">
       <NuxtLink
         to="/signup"
         class="hover:underline"

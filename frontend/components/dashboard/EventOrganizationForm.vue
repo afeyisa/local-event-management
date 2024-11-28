@@ -2,9 +2,13 @@
 import { ref } from 'vue'
 import { useMutation } from '@vue/apollo-composable'
 import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
-import { CREATE_ORGANIZATION, UPDATE_ORGANIZATION } from '~/graphql/mutation'
+import { useToast } from 'vue-toastification/dist/index.mjs'
+import { UPDATE_ORGANIZATION } from '~/graphql/mutations/updateOrganization.graphql'
+import { CREATE_ORGANIZATION } from '~/graphql/mutations/createOraganization.graphql'
 import { apolloClient } from '~/plugins/apollo'
-import { GET_ORGANIZATIONS } from '~/graphql/queries'
+import { GET_ORGANIZATIONS } from '~/graphql/querie/getOrganization.graphql'
+import { UPLOAD_ORG_PROFILE_URL } from '~/graphql/mutations/saveOrgProfileImageurl.graphql'
+import { uploadImages } from '~/composables/uploadImages'
 
 const { id } = defineProps({
   id: {
@@ -12,6 +16,7 @@ const { id } = defineProps({
     required: false,
   },
 })
+const toast = useToast()
 
 defineRule('required', (value) => {
   if (!value || !value.length) {
@@ -20,9 +25,9 @@ defineRule('required', (value) => {
   return true
 })
 
+const base64Thummbnail = ref(null)
 const formData = ref({
   organization_name: ref(''),
-  profile: ref(null),
   bio: ref(''),
   description: ref(''),
 })
@@ -38,52 +43,75 @@ if (id) {
     /** */
   }
 }
-const successMessage = ref('')
-const errorMessage = ref('')
+
+const handleThumbnailChange = async (e) => {
+  if (id) {
+    try {
+      const t = await encodeB64(e.target.files[0])
+      const res = await uploadImages(t, [])
+      if (res) {
+        const { mutate } = useMutation(UPLOAD_ORG_PROFILE_URL)
+        const { data } = await mutate({ organization_id: id, profile_photo_url: res.thumbnailImageUrl })
+        if (data) {
+          toast.success('thumbail changed')
+        }
+      }
+    }
+    catch (err) {
+      console.log(err)
+      toast.error('unbale update thumbnail')
+    }
+  }
+  else {
+    try {
+      base64Thummbnail.value = await encodeB64(e.target.files[0])
+      toast.info('image encoded')
+    }
+    catch {
+      toast.error('some thing went wrong during thumbnail encoding')
+    }
+  }
+}
 
 const handleSubmit = async () => {
   try {
-    let profile_photo_url
-    if (formData.value.profile) {
-      const formdata = new FormData()
-      formdata.append('thumbnailimage', formData.value.profile)
-      const response = await fetch('http://localhost:4000/upload', {
-        method: 'POST',
-        body: formdata,
-      })
-      if (response.ok) {
-        const { thumbnail_image_url } = await response.json()
-        profile_photo_url = thumbnail_image_url
-      }
-    }
-
     if (id) {
       const { mutate: createOrganization } = useMutation(UPDATE_ORGANIZATION)
       const { data } = await createOrganization({
         organization_name: formData.value.organization_name,
-        profile_photo_url: profile_photo_url,
         bio: formData.value.bio,
         description: formData.value.description,
         organization_id: id,
       })
+      if (data) {
+        toast.success('success')
+      }
       const router = useRouter()
-      console.log(data)
       router.push(`/events/organizations/${data.update_data_organizations_by_pk.organization_id}`)
     }
     else {
       const { mutate: createOrganization } = useMutation(CREATE_ORGANIZATION)
       const { data } = await createOrganization({
         organization_name: formData.value.organization_name,
-        profile_photo_url: profile_photo_url,
         bio: formData.value.bio,
         description: formData.value.description,
       })
+
+      const res = await uploadImages(base64Thummbnail.value, [])
+      if (res.thumbnailImageUrl) {
+        const { mutate } = useMutation(UPLOAD_ORG_PROFILE_URL)
+        const { data: d } = await mutate({ organization_id: data.insert_data_organizations_one.organization_id, profile_photo_url: res.thumbnailImageUrl })
+        if (d) {
+          toast.success('success')
+        }
+      }
+
       const router = useRouter()
       router.push(`/events/organizations/${data.insert_data_organizations_one.organization_id}`)
     }
   }
-  catch (error) {
-    errorMessage.value = 'Failed to submit form: ' + error.message
+  catch {
+    toast.error('Failed to submit form')
   }
 }
 </script>
@@ -143,7 +171,7 @@ const handleSubmit = async () => {
           </div>
           <Field
             id="thumbnail-file"
-            v-model="formData.profile"
+            :onchange="handleThumbnailChange"
             type="file"
             class="hidden"
             accept="image/*"
@@ -192,19 +220,5 @@ const handleSubmit = async () => {
         {{ id?'Update ':'create' }}
       </button>
     </Form>
-
-    <div
-      v-if="successMessage"
-      class="mt-4 text-green-600"
-    >
-      {{ successMessage }}
-    </div>
-
-    <div
-      v-if="errorMessage"
-      class="mt-4 text-red-600"
-    >
-      {{ errorMessage }}
-    </div>
   </div>
 </template>

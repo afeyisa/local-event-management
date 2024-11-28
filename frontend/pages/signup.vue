@@ -1,7 +1,7 @@
 <script setup>
 import { Field, Form, defineRule, ErrorMessage } from 'vee-validate'
 import { useMutation } from '@vue/apollo-composable'
-import { SIGNUP_MUTATION } from '~/graphql/mutation'
+import { SIGNUP_MUTATION } from '~/graphql/mutations/signup.graphql'
 
 const limit = 5
 
