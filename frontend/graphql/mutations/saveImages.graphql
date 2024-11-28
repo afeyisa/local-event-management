@@ -1,0 +1,11 @@
+import { gql } from 'graphql-tag'
+
+export const SAVEIMAGES = gql`
+  mutation saveImages($otherImages:[String], $thumbnail: String){
+  saveImages(otherImages: $otherImages, thumbnail: $thumbnail) {
+    errors
+    other_images_urls
+    thumbnail_image_url
+  }
+}
+`

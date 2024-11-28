@@ -1,8 +1,22 @@
-export const CHECKOUT_TICKET = gql`
-mutation checkoutTicket ($event_id:String!,$user_id:String!){
-  ticketcheckout(event_id: $event_id, user_id: $user_id) {
-    url
-  }
-}
+import { gql } from 'graphql-tag'
 
+export const CHECKOUT_TICKET = gql`
+  mutation checkoutTicket (
+    $event_id:uuid!,
+    $user_id:uuid!,
+    $email:String!,
+    $first_name: String!,
+    $last_name:String!,
+    $phone_number:String!){
+    ticketcheckoutpaid(
+      event_id: $event_id, 
+      user_id: $user_id,
+      email:$email,
+      first_name: $first_name,
+      last_name: $last_name,
+      phone_number: $phone_number,
+      ) {
+        url
+    }
+}
 `

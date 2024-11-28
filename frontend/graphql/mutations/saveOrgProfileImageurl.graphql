@@ -1,0 +1,9 @@
+import { gql } from 'graphql-tag'
+export const UPLOAD_ORG_PROFILE_URL = gql`
+mutation insertProfile ($organization_id:uuid!,$profile_photo_url:String) {
+ 
+  update_data_organizations(where: {organization_id: {_eq: $organization_id}}, _set: {profile_photo_url: $profile_photo_url}) {
+    affected_rows
+  }
+}
+`

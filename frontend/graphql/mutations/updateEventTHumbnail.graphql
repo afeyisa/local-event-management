@@ -1,0 +1,12 @@
+import { gql } from 'graphql-tag'
+
+export const UPDATE_EVENT_THUMBNAIL = gql`
+mutation UpdateEventThumbnail($event_id: uuid!, $thumbnail_image_url: String!) {
+  update_data_events(
+    where: { event_id: { _eq: $event_id } },
+    _set: { thumbnail_image_url: $thumbnail_image_url }
+  ) {
+    affected_rows
+  }
+}
+`

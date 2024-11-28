@@ -1,3 +1,4 @@
+import { gql } from 'graphql-tag'
 export const CREATE_EVENT = gql`
 mutation insertEvent(
   $by_organization_id: uuid!,
@@ -8,8 +9,6 @@ mutation insertEvent(
   $category_id: uuid,
   $description: String,
   $venue: String,
-  $thumbnail_image_url: String,
-  $images: [data_images_insert_input!]!,  
   $location: data_locations_insert_input!,
   $address: data_address_insert_input!,
   $tags: [data_event_tags_insert_input!]! 
@@ -24,9 +23,6 @@ mutation insertEvent(
       category_id: $category_id,
       description: $description,
       venue: $venue,
-      thumbnail_image_url: $thumbnail_image_url,
-
-      images: {data: $images}, 
       location: {data: $location},
       address: {data: $address},
       event_tags: {data: $tags},

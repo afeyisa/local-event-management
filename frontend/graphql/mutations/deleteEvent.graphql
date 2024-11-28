@@ -1,3 +1,4 @@
+import { gql } from 'graphql-tag'
 export const DELETE_EVENT = gql`
 mutation deleteEvent(
   $event_id: uuid!
@@ -5,4 +6,4 @@ mutation deleteEvent(
   delete_data_events(where: {event_id: {_eq: $event_id}}) {
     affected_rows
   }
-}
+}`

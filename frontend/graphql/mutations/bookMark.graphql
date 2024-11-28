@@ -1,3 +1,4 @@
+import { gql } from 'graphql-tag'
 export const BOOK_MARK_EVENT = gql`
   mutation bookMarkEvent(
     $book_marked_event_id: uuid!

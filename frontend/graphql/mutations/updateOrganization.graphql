@@ -1,3 +1,5 @@
+import { gql } from 'graphql-tag'
+
 export const UPDATE_ORGANIZATION = gql`
   mutation UpdateOrganization(
     $organization_name: String!,

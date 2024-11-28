@@ -1,3 +1,5 @@
+import { gql } from 'graphql-tag'
+
 export const UN_BOOK_MARK_EVENT = gql`
   mutation unBookMarkEvent(
     $book_marker_user_id: uuid!

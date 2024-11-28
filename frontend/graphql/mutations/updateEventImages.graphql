@@ -1,0 +1,16 @@
+import { gql } from 'graphql-tag'
+
+export const UDATE_IMAGES = gql`
+  mutation deleteImage(
+  $event_id:uuid!,
+  $images: [data_images_insert_input!]!){
+    
+  delete_data_images(where: { event_id: { _eq: $event_id } }) {
+    affected_rows
+  }
+
+  insert_data_images(objects:$images) {
+    affected_rows
+  }
+}
+`

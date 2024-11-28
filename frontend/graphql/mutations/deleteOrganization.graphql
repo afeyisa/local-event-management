@@ -1,3 +1,4 @@
+import { gql } from 'graphql-tag'
 export const DELETE_ORG = gql`
 mutation deleteOrg($organization_id:uuid!) {
   delete_data_organizations(where: {organization_id: {_eq: $organization_id}}) {
