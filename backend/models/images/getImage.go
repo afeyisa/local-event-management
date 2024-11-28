@@ -9,12 +9,11 @@ import (
 	"strings"
 )
 
-var path = "./uploads"
 
 func GetImage(link types.Url) (response types.Image, err error) {
 
-	const baseURL = "http://localhost:4000/uploads"
-
+	var baseURL = os.Getenv("BASE_URL")
+	var path = os.Getenv("UPLOAD_PATH")
 	if !strings.HasPrefix(link.Link, baseURL) {
 		return response, fmt.Errorf("invalid link format")
 	}
@@ -30,6 +29,7 @@ func GetImage(link types.Url) (response types.Image, err error) {
 	
 	data, err := os.ReadFile(absoluteFilePath)
 	if err != nil {
+		fmt.Println(err)
 		return response, fmt.Errorf("error reading file")
     }
 

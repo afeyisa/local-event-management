@@ -9,9 +9,7 @@ import (
 )
 		
 //**************authentication with JWT*******************************************************
-func MakeJWT(userID uuid.UUID, tokenSecret []byte, role string, expiresIn time.Duration) (string, error) {
-	fmt.Println("making token")
-	
+func MakeJWT(userID uuid.UUID, tokenSecret []byte, role string, expiresIn time.Duration) (string, error) {	
 	claims := &jwt.MapClaims{
 		
 		"iss": "local-event-management",
@@ -51,12 +49,17 @@ func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
 		return uuid.Nil, err
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID, err := uuid.Parse(claims["sub"].(string))
+	if claims, ok := token.Claims.(*jwt.MapClaims); ok && token.Valid {
+		userID, err := claims.GetSubject()
 		if err != nil {
 			return uuid.Nil, fmt.Errorf("invalid subject in token")
 		}
-		return userID, nil
+
+		id,err:=uuid.Parse(userID)
+		if err != nil {
+			return uuid.Nil, fmt.Errorf("invalid subject in token")
+		}
+		return id, nil
 	}
 	return uuid.Nil, fmt.Errorf("invalid token")
 }

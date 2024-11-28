@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"local-event-management-backend/auth"
+	"local-event-management-backend/helpers/auth"
 	graphqlclient "local-event-management-backend/graphql/graphqlclient"
 	mutations "local-event-management-backend/graphql/mutations"
 	"local-event-management-backend/types"
@@ -33,6 +33,5 @@ func InsertUser(args types.InsertUserArgs) (res mutations.InsertUser, err error)
         fmt.Println(err)
 		return 
 	}
-
 	return
 }

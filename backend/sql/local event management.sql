@@ -190,22 +190,38 @@ CREATE TRIGGER increase_followers_trigger
 AFTER INSERT ON data.follows
 FOR EACH ROW
 EXECUTE FUNCTION data.increase_followers();
+-- decrease number avaliable tickets
+CREATE OR REPLACE FUNCTION data.decrease_available_tickets()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE data.events
+  SET total_available_tickets = total_available_tickets - 1
+  WHERE event_id = NEW.event_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE TRIGGER decrease_total_available_tickets_trigger
+AFTER INSERT ON data.tickets
+FOR EACH ROW
+EXECUTE FUNCTION data.decrease_available_tickets();
+-- -------------------------------------------
 CREATE TRIGGER decrease_followers_trigger
 AFTER DELETE ON data.follows
 FOR EACH ROW
 EXECUTE FUNCTION data.decrease_followers();
 
 
-CREATE OR REPLACE FUNCTION data.get_user_organizations(user_id uuid)
-RETURNS SETOF uuid AS $$
-  SELECT organization_id
-  FROM data.organizes
-  WHERE organizer_id = user_id;
-$$ LANGUAGE sql STABLE;
-DROP FUNCTION IF EXISTS data.get_user_organizations(uuid);
+-- CREATE OR REPLACE FUNCTION data.get_user_organizations(user_id uuid)
+-- RETURNS SETOF uuid AS $$
+--   SELECT organization_id
+--   FROM data.organizes
+--   WHERE organizer_id = user_id;
+-- $$ LANGUAGE sql STABLE;
+-- DROP FUNCTION IF EXISTS data.get_user_organizations(uuid);
 
-DROP FUNCTION IF EXISTS data.insert_into_organizes();
+-- DROP FUNCTION IF EXISTS data.insert_into_organizes();
+
 CREATE OR REPLACE FUNCTION data.insert_into_organizes()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -213,16 +229,11 @@ AS $function$
 DECLARE
     user_id uuid;
 BEGIN
-    -- Fetch the user_id (organizer_id) dynamically from the users table or JWT session
     SELECT user_id INTO user_id
     FROM data.data_users
     WHERE user_id = current_setting('hasura.user');
-
-    -- Insert into data_organizes using the fetched user_id and the new organization_id
     INSERT INTO data.data_organizes (organization_id, organizer_id)
     VALUES (NEW.organization_id, user_id);
-
-    -- Return the new row (or NULL if not applicable)
     RETURN NEW;
 END;
 $function$;
@@ -232,6 +243,41 @@ AFTER INSERT ON data.organizations
 FOR EACH ROW
 EXECUTE FUNCTION data.insert_into_organizes();
 
-CREATE VIEW data.PublicEvents AS
-SELECT *
-FROM data.events;
+CREATE EXTENSION IF NOT EXISTS postgis SCHEMA data;
+CREATE OR REPLACE FUNCTION data.get_nearby_events(user_lat double precision, user_lon double precision, radius double precision DEFAULT 100000)
+ RETURNS SETOF data.events
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  RETURN QUERY
+  SELECT e.*
+  FROM data.events e
+  JOIN data.locations l ON e.event_id = l.located_event_id
+  WHERE data.ST_DWithin(
+         data.ST_SetSRID(data.ST_MakePoint(l.longitude, l.latitude), 4326)::data.geography, 
+         data.ST_SetSRID(data.ST_MakePoint(user_lon, user_lat), 4326)::data.geography,
+         radius
+      )
+  ORDER BY data.ST_Distance(
+            data.ST_SetSRID(data.ST_MakePoint(l.longitude, l.latitude), 4326)::data.geography, 
+            data.ST_SetSRID(data.ST_MakePoint(user_lon, user_lat), 4326)::data.geography
+         ) ASC;  
+END;
+$function$
+
+CREATE OR REPLACE FUNCTION track_last_modified_user()
+RETURNS TRIGGER AS $$
+DECLARE
+  user_id uuid;
+BEGIN
+  SELECT (current_setting('hasura.user')::json ->> 'x-hasura-user-id')::uuid INTO user_id;
+  NEW.last_modified_by := user_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER track_last_modified_user_trigger
+BEFORE INSERT OR UPDATE ON events
+FOR EACH ROW
+EXECUTE FUNCTION data.track_last_modified_user();

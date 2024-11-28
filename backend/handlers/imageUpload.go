@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	models "local-event-management-backend/models/images"
 	"local-event-management-backend/types"
@@ -10,8 +9,8 @@ import (
 )
 
 func ImageUploads(w http.ResponseWriter, r *http.Request){
-	fmt.Println("saving the images")
 	w.Header().Set("Content-Type","application/json")
+	defer r.Body.Close()
 
 	reqBody,err := io.ReadAll(r.Body)
 	if err != nil {
@@ -25,20 +24,7 @@ func ImageUploads(w http.ResponseWriter, r *http.Request){
 		http.Error(w, "invalid payload", http.StatusBadRequest)
 		return
 	}
-
 	result := models.SaveImages(payload.Input)
-	data, err := json.Marshal(result)
-
-	if err != nil{
-		errorObject := types.GraphQLError{
-			Message: " un able to create links",
-		}
-	err ,_ := json.Marshal(errorObject)
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write(err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(data)
+	json.NewEncoder(w).Encode(result)
 
 }

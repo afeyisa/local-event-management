@@ -10,14 +10,14 @@ import (
 	"github.com/google/uuid"
 )
 
-var uploadPath = "./uploads/"
 
 func isImageFile(ext string) bool {
-	return ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif"
+	return ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "gif"|| ext == "webp"
 }
 
 func saveHelper(image string)(url string,err error){
-
+	var uploadPath = os.Getenv("UPLOAD_PATH")
+	fmt.Println("upload path in saving",uploadPath)
 	parts := strings.SplitN(image,",",2)
 
 	if len(parts) < 2 {
@@ -50,21 +50,18 @@ func saveHelper(image string)(url string,err error){
     if writeErr != nil {
 		return "", fmt.Errorf("failed to write image file: %v", writeErr)
     }
-	url = fmt.Sprintf("http://localhost:4000/uploads/%s.%s", fileName, extension)
+	url = fmt.Sprintf("%s/%s.%s", os.Getenv("BASE_URL"), fileName, extension)
 	return url, nil
 }
 
 
 func SaveImages(payload types.Images)(res types.Urls){
-	fmt.Println("saving the from the model")
 	var errors []string
 	if(payload.ThumbNail !=""){
 		url, saveErr := saveHelper(payload.ThumbNail)
-		fmt.Println(url," test1")
 		if saveErr != nil {
 			errors = append(errors, saveErr.Error())
 		} else{
-			fmt.Println(url)
 			res.Thumbnail_image_url = url}
 	}
 	if len(payload.OtherImages) > 0 {

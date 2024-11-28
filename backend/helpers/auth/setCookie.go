@@ -12,6 +12,5 @@ func SetCookie(token string, time int) *http.Cookie{
 		SameSite: http.SameSiteDefaultMode,
 		MaxAge:   time,
 	}
-
 	return &cookie
 }

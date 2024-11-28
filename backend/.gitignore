@@ -25,3 +25,7 @@ go.work.sum
 /docker
 # env file
 .env
+/ngrok.yml
+/credentials
+/token.json
+aes.go

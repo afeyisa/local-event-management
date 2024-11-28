@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"local-event-management-backend/auth"
+	"local-event-management-backend/helpers/auth"
 	"net/http"
 	"os"
 	"strings"
