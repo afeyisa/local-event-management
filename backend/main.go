@@ -10,10 +10,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"syscall"
+	// "syscall"
 
 	"github.com/joho/godotenv"
-	"golang.org/x/term"
+	// "golang.org/x/term"
 	"google.golang.org/api/gmail/v1"
 )
 
@@ -28,7 +28,7 @@ func main() {
     }
 	
 	fmt.Print("Please Credential key: ")
-	k, err := term.ReadPassword(int(syscall.Stdin))
+	// k, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		log.Fatalf("Failed to read key: %v", err)
 	}
@@ -36,7 +36,7 @@ func main() {
 	fmt.Println()
 	f := "credentials"
 
-	email.InitializeGmailService(auth.DecryptCredentials(f, string(k)),"token.json",gmail.GmailSendScope)
+	email.InitializeGmailService(auth.DecryptCredentials(f, os.Getenv("CRIDENTIALS")),"token.json",gmail.GmailSendScope)
 	mux := http.NewServeMux()
  	mux.Handle("/login",					 middleware.HasuraAuth(http.HandlerFunc(handlers.LoginHandler)))
   	mux.Handle("/register",					 middleware.HasuraAuth(http.HandlerFunc(handlers.RegisterHandler)))
