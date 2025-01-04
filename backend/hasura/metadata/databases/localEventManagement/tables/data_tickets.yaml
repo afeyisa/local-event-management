@@ -1,0 +1,47 @@
+table:
+  name: tickets
+  schema: data
+object_relationships:
+  - name: event
+    using:
+      foreign_key_constraint_on: event_id
+  - name: user
+    using:
+      foreign_key_constraint_on: ticket_owner_id
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - event_id
+        - purchased_date
+        - qr_link
+        - ticket_id
+        - ticket_owner_id
+        - tx_ref
+      filter:
+        ticket_owner_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+event_triggers:
+  - name: deleteQrlink
+    definition:
+      delete:
+        columns: '*'
+      enable_manual: false
+      update:
+        columns:
+          - qr_link
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook: http://host.docker.internal:4000/deletethumbnailimage
+    request_transform:
+      body:
+        action: transform
+        template: |-
+          {
+           "thumbnail_image_url":{{$body.event.data.old.qr_link}}
+          }
+      template_engine: Kriti
+      version: 2

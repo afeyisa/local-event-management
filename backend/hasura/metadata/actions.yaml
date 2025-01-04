@@ -1,0 +1,112 @@
+actions:
+  - name: getImage
+    definition:
+      kind: ""
+      handler: http://host.docker.internal:4000/serveimage
+      forward_client_headers: true
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: anonymous
+      - role: user
+  - name: isAuthenticated
+    definition:
+      kind: ""
+      handler: http://host.docker.internal:4000/protectpageroute
+      forward_client_headers: true
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: anonymous
+      - role: user
+  - name: login
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:4000/login
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: user
+      - role: anonymous
+  - name: logout
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:4000/logout
+      forward_client_headers: true
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: user
+  - name: saveImages
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:4000/upload
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: user
+  - name: signup
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:4000/register
+      forward_client_headers: true
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: user
+      - role: anonymous
+  - name: ticketcheckoutfree
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:4000/tickectcheckout/free
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: user
+  - name: ticketcheckoutpaid
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:4000/tickectcheckout/paid
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: user
+  - name: verifyPayment
+    definition:
+      kind: ""
+      handler: http://host.docker.internal:4000/verifypayment
+      forward_client_headers: true
+      headers:
+        - name: X-ACTION-SECRET
+          value_from_env: ACTION_SECRET_ENV
+    permissions:
+      - role: user
+custom_types:
+  enums: []
+  input_objects:
+    - name: loginArgs
+    - name: SampleInput
+    - name: images
+  objects:
+    - name: RegisterOutput
+    - name: LoginResponse
+    - name: LoginOutput
+    - name: LogoutResponse
+    - name: SampleOutput
+    - name: isAuthenticated
+    - name: url
+    - name: ticketcheckout
+    - name: ticketcheckouturl
+    - name: urls
+    - name: image
+    - name: status
+    - name: message
+  scalars: []

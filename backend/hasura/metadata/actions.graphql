@@ -1,0 +1,128 @@
+type Query {
+  getImage(
+    link: String
+  ): image
+}
+
+type Query {
+  isAuthenticated: Boolean
+}
+
+type Mutation {
+  login(
+    email: String!
+    password: String!
+  ): LoginResponse
+}
+
+type Mutation {
+  logout: LogoutResponse
+}
+
+type Mutation {
+  saveImages(
+    thumbnail: String
+    otherImages: [String]
+  ): urls
+}
+
+type Mutation {
+  signup(
+    email: String
+    password: String
+  ): LoginResponse
+}
+
+type Mutation {
+  ticketcheckoutfree(
+    event_id: uuid!
+    user_id: uuid!
+  ): message
+}
+
+type Mutation {
+  ticketcheckoutpaid(
+    event_id: uuid!
+    user_id: uuid!
+    first_name: String!
+    last_name: String!
+    email: String!
+    phone_number: String!
+  ): url
+}
+
+type Query {
+  verifyPayment(
+    tx_ref: String!
+  ): status
+}
+
+input loginArgs {
+  email: String!
+  password: String!
+}
+
+input SampleInput {
+  username: String!
+  password: String!
+}
+
+input images {
+  thumbnail: String
+  otherImages: [String]
+}
+
+type RegisterOutput {
+  user_id: uuid!
+}
+
+type LoginResponse {
+  success: Boolean
+}
+
+type LoginOutput {
+  email: String!
+}
+
+type LogoutResponse {
+  success: Boolean
+}
+
+type SampleOutput {
+  accessToken: String!
+}
+
+type isAuthenticated {
+  isAuthenticated: Boolean
+}
+
+type url {
+  url: String
+}
+
+type ticketcheckout {
+  ticketcheckout: String
+}
+
+type ticketcheckouturl {
+  ticketcheckouturl: String
+}
+
+type urls {
+  thumbnail_image_url: String
+  other_images_urls: [String]
+  errors: [String]
+}
+
+type image {
+  image: String
+}
+
+type status {
+  status: String
+}
+
+type message {
+  message: String
+}
+

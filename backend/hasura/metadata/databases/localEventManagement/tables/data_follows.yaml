@@ -1,0 +1,38 @@
+table:
+  name: follows
+  schema: data
+object_relationships:
+  - name: organization
+    using:
+      foreign_key_constraint_on: followed_organization_id
+  - name: user
+    using:
+      foreign_key_constraint_on: following_user_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        user:
+          user_id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - followed_organization_id
+        - following_user_id
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - followed_organization_id
+        - following_user_id
+      filter:
+        following_user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        following_user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""

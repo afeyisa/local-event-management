@@ -1,0 +1,200 @@
+table:
+  name: events
+  schema: data
+object_relationships:
+  - name: address
+    using:
+      foreign_key_constraint_on:
+        column: addressed_event_id
+        table:
+          name: address
+          schema: data
+  - name: category
+    using:
+      foreign_key_constraint_on: category_id
+  - name: location
+    using:
+      foreign_key_constraint_on:
+        column: located_event_id
+        table:
+          name: locations
+          schema: data
+  - name: organization
+    using:
+      foreign_key_constraint_on: by_organization_id
+  - name: user
+    using:
+      foreign_key_constraint_on: last_modified_by
+array_relationships:
+  - name: bookmarks
+    using:
+      foreign_key_constraint_on:
+        column: book_marked_event_id
+        table:
+          name: bookmarks
+          schema: data
+  - name: event_tags
+    using:
+      foreign_key_constraint_on:
+        column: tagged_event_id
+        table:
+          name: event_tags
+          schema: data
+  - name: images
+    using:
+      foreign_key_constraint_on:
+        column: event_id
+        table:
+          name: images
+          schema: data
+  - name: payments
+    using:
+      foreign_key_constraint_on:
+        column: paid_for_event_id
+        table:
+          name: payments
+          schema: data
+  - name: tickets
+    using:
+      foreign_key_constraint_on:
+        column: event_id
+        table:
+          name: tickets
+          schema: data
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        organization:
+          organizes:
+            organizer_id:
+              _eq: X-Hasura-User-Id
+      set:
+        last_modified_by: x-hasura-User-Id
+      columns:
+        - thumbnail_image_url
+        - title
+        - event_date
+        - total_available_tickets
+        - ticket_price
+        - description
+        - venue
+        - created_at
+        - by_organization_id
+        - category_id
+        - event_id
+    comment: ""
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - thumbnail_image_url
+        - title
+        - event_date
+        - total_available_tickets
+        - ticket_price
+        - description
+        - venue
+        - created_at
+        - by_organization_id
+        - category_id
+        - event_id
+      filter: {}
+      allow_aggregations: true
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - thumbnail_image_url
+        - title
+        - event_date
+        - total_available_tickets
+        - ticket_price
+        - description
+        - venue
+        - created_at
+        - by_organization_id
+        - category_id
+        - event_id
+      filter: {}
+      allow_aggregations: true
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - thumbnail_image_url
+        - title
+        - event_date
+        - total_available_tickets
+        - ticket_price
+        - description
+        - venue
+        - created_at
+        - by_organization_id
+        - category_id
+        - event_id
+      filter:
+        organization:
+          organizes:
+            organizer_id:
+              _eq: X-Hasura-User-Id
+      check: null
+      set:
+        last_modified_by: x-hasura-User-Id
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        organization:
+          organizes:
+            organizer_id:
+              _eq: X-Hasura-User-Id
+    comment: ""
+event_triggers:
+  - name: deleteThumbnailImage
+    definition:
+      delete:
+        columns: '*'
+      enable_manual: false
+      update:
+        columns:
+          - thumbnail_image_url
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook: http://host.docker.internal:4000/deletethumbnailimage
+    headers:
+      - name: X-ACTION-SECRET
+        value_from_env: ACTION_SECRET_ENV
+    request_transform:
+      body:
+        action: transform
+        template: |-
+          {
+
+            "thumbnail_image_url":{{$body.event.data.old.thumbnail_image_url}}
+          }
+      template_engine: Kriti
+      version: 2
+  - name: sendEmails
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook: http://host.docker.internal:4000/emailsender
+    headers:
+      - name: X-ACTION-SECRET
+        value_from_env: ACTION_SECRET_ENV
+    request_transform:
+      body:
+        action: transform
+        template: "{\r\n\t\"by_organization_id\":{{$body.event.data.new.by_organization_id}} ,\r\n\t\"description\": {{$body.event.data.new.description}},\r\n\t\"event_date\": {{$body.event.data.new.event_date}},\r\n\t\"event_id\": {{$body.event.data.new.event_id}},\r\n\t\"title\": {{$body.event.data.new.title}}\r\n  }"
+      template_engine: Kriti
+      version: 2

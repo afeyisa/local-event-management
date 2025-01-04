@@ -1,0 +1,40 @@
+table:
+  name: organizes
+  schema: data
+object_relationships:
+  - name: organization
+    using:
+      foreign_key_constraint_on: organization_id
+  - name: user
+    using:
+      foreign_key_constraint_on: organizer_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        user:
+          user_id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - organization_id
+        - organizer_id
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - organization_id
+        - organizer_id
+      filter:
+        user:
+          user_id:
+            _eq: X-Hasura-User-Id
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        user:
+          user_id:
+            _eq: X-Hasura-Id
+    comment: ""

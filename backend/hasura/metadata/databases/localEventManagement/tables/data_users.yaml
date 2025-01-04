@@ -1,0 +1,67 @@
+table:
+  name: users
+  schema: data
+array_relationships:
+  - name: bookmarks
+    using:
+      foreign_key_constraint_on:
+        column: book_marker_user_id
+        table:
+          name: bookmarks
+          schema: data
+  - name: events
+    using:
+      foreign_key_constraint_on:
+        column: last_modified_by
+        table:
+          name: events
+          schema: data
+  - name: follows
+    using:
+      foreign_key_constraint_on:
+        column: following_user_id
+        table:
+          name: follows
+          schema: data
+  - name: organizes
+    using:
+      foreign_key_constraint_on:
+        column: organizer_id
+        table:
+          name: organizes
+          schema: data
+  - name: payments
+    using:
+      foreign_key_constraint_on:
+        column: payer_user_id
+        table:
+          name: payments
+          schema: data
+  - name: tickets
+    using:
+      foreign_key_constraint_on:
+        column: ticket_owner_id
+        table:
+          name: tickets
+          schema: data
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - user_id
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - password
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+      check:
+        user_id:
+          _eq: X-Hasura-User-Id
+    comment: ""

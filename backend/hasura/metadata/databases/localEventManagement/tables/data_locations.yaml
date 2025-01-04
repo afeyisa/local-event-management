@@ -1,0 +1,66 @@
+table:
+  name: locations
+  schema: data
+object_relationships:
+  - name: event
+    using:
+      foreign_key_constraint_on: located_event_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        event:
+          organization:
+            organizes:
+              user:
+                user_id:
+                  _eq: X-Hasura-User-Id
+      columns:
+        - latitude
+        - longitude
+        - located_event_id
+    comment: ""
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - latitude
+        - longitude
+        - located_event_id
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - latitude
+        - longitude
+        - located_event_id
+      filter: {}
+    comment: ""
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - latitude
+        - longitude
+        - located_event_id
+      filter:
+        event:
+          organization:
+            organizes:
+              user:
+                user_id:
+                  _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
+delete_permissions:
+  - role: user
+    permission:
+      filter:
+        event:
+          organization:
+            organizes:
+              user:
+                user_id:
+                  _eq: X-Hasura-Id
+    comment: ""

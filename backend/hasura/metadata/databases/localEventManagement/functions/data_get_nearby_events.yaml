@@ -1,0 +1,6 @@
+function:
+  name: get_nearby_events
+  schema: data
+configuration:
+  custom_root_fields: {}
+  exposed_as: query

@@ -1,0 +1,26 @@
+table:
+  name: categories
+  schema: data
+array_relationships:
+  - name: events
+    using:
+      foreign_key_constraint_on:
+        column: category_id
+        table:
+          name: events
+          schema: data
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - category_name
+        - category_id
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - category_name
+        - category_id
+      filter: {}
+    comment: ""
