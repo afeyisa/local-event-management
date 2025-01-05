@@ -109,10 +109,10 @@ const toggleDate = () => {
             class="text-center py-12 mb-12 bg-gradient-to-r from-blue-400 to-blue-700 text-white rounded-lg shadow-lg mt-1 w-full"
           >
             <h2 class=" sm:text-5xl text-3xl  font-extrabold mb-4">
-              Welcome to events
+              Welcome to kevent
             </h2>
             <p class="sm:text-xl text-2xl ">
-              where you can browse events near by you, create and post events, eventkly is a platform where you can find events near by you, create and post events, and also find events near by you.
+              kevent is a platform where you can create and post events, and also search events near by you.
             </p>
           </section>
 
