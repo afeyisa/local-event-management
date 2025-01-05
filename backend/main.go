@@ -54,6 +54,6 @@ func main() {
 	mux.Handle("/chapawebhook", 			 middleware.ChapaAuth(http.HandlerFunc(handlers.ChapaWebHookHandler)))
 
 	fmt.Println("server started:")
-	err := http.ListenAndServe(os.Getenv("PORT"), mux)
+	err := http.ListenAndServe(":" + os.Getenv("PORT"), mux)
 	log.Fatal(err)
 }
