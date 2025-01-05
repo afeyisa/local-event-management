@@ -12,7 +12,7 @@ import (
 	"os"
 	// "syscall"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	// "golang.org/x/term"
 	"google.golang.org/api/gmail/v1"
 )
@@ -22,18 +22,18 @@ import (
 
 func main() {
 		
-	err := godotenv.Load()
-    if err != nil {
-        log.Fatal("Error loading .env file")
-    }
+	// err := godotenv.Load()
+    // if err != nil {
+    //     log.Fatal("Error loading .env file")
+    // }
 	
-	fmt.Print("Please Credential key: ")
+	// fmt.Print("Please Credential key: ")
 	// k, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		log.Fatalf("Failed to read key: %v", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("Failed to read key: %v", err)
+	// }
 
-	fmt.Println()
+	// fmt.Println()
 	f := "credentials"
 
 	email.InitializeGmailService(auth.DecryptCredentials(f, os.Getenv("CRIDENTIALS")),"token.json",gmail.GmailSendScope)
