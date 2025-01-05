@@ -25,6 +25,5 @@ go.work.sum
 # env file
 .env
 /ngrok.yml
-/credentials
 /token.json
 aes.go
