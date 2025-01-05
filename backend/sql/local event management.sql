@@ -21,7 +21,7 @@ CREATE TABLE data.organizations (
   description text,
   followers int DEFAULT 0
   created_at timestamp DEFAULT CURRENT_TIMESTAMP
-  CHECK(followers >= 0))
+  CHECK(followers >= 0)
 );
 
 CREATE TABLE data.follows (
