@@ -5,7 +5,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /backend/app
-EXPOSE 8080
+EXPOSE 4000
 CMD ["/backend/app"]
 #1 Build the image
 # docker build --tag backend .
@@ -21,6 +21,6 @@ CMD ["/backend/app"]
 # Untagged: docker-gs-ping:v1.0
 
 # 5 Run the image
-# docker run --publish 8080:4000 backend
+# docker run --publish 4000:4000 backend
 # 6 Run the image in detached mode
 # docker run -d -p 8080:8080 backend
