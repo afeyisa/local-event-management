@@ -112,7 +112,7 @@ const toggleDate = () => {
               Welcome to events
             </h2>
             <p class="sm:text-xl text-2xl ">
-              where you can browse events near by you, create and post events
+              where you can browse events near by you, create and post events, eventkly is a platform where you can find events near by you, create and post events, and also find events near by you.
             </p>
           </section>
 
